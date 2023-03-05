@@ -7,5 +7,7 @@ abstract class Entity {
 
   Map<String, String> getPrimaryKeys();
 
+  void setPrimaryKeys(Map<String, dynamic> keys);
+
   Entity fromMap(Map<dynamic, dynamic> map);
 }

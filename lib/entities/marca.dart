@@ -23,6 +23,11 @@ class Marca extends Entity {
   }
 
   @override
+  void setPrimaryKeys(Map<String, dynamic> keys) {
+    idMarca = keys['id_marca'];
+  }
+
+  @override
   Entity fromMap(Map map) {
     return Marca.fromMap(map);
   }

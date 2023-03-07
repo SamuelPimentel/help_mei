@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/contas_mes.dart';
 import 'package:help_mei/entities/fornecedor.dart';
 import 'package:help_mei/entities/marca.dart';
@@ -62,6 +63,7 @@ class SqliteService {
     _createTableTipoFornecimentoV1(batch);
     _createTableFornecedorV1(batch);
     _createTableContasMesV1(batch);
+    _createTableContasV1(batch);
     await batch.commit();
   }
 
@@ -71,8 +73,13 @@ class SqliteService {
       _createTableTipoFornecimentoV1(batch);
       _createTableFornecedorV1(batch);
       _createTableContasMesV1(batch);
+      _createTableContasV1(batch);
     }
     await batch.commit();
+  }
+
+  void _createTableContasV1(Batch batch) {
+    batch.execute(ContaTable.createStringV1);
   }
 
   void _createTableContasMesV1(Batch batch) {

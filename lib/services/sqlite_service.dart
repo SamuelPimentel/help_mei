@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:help_mei/entities/marca.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -53,12 +54,8 @@ class SqliteService {
   }
 
   void _createTableMarcaV1(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS marca;');
-    batch.execute('''
-      CREATE TABLE marca (
-        id_marca INTEGER PRIMARY KEY,
-        nome_marca TEXT NOT NULL UNIQUE
-      );''');
+    batch.execute('DROP TABLE IF EXISTS ${MarcaTable.tableName};');
+    batch.execute(MarcaTable.createStringV1);
   }
 
   void _createTableCategoriaV1(Batch batch) {

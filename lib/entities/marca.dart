@@ -36,7 +36,7 @@ class Marca extends Entity {
 
   @override
   Map<String, String> getPrimaryKeys() {
-    return {MarcaTable.nomeMarcaName: idMarca.toString()};
+    return {MarcaTable.idMarcaName: idMarca.toString()};
   }
 
   @override

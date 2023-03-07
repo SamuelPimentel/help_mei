@@ -2,6 +2,25 @@ import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
 import 'package:help_mei/entities/marca.dart';
 
+class ProdutoTable {
+  static const tableName = 'produto';
+  static const idProdutoName = 'id_produto';
+  static const nomeProdutoName = 'nome_produto';
+  static const descricaoProdutoName = 'descricao_produto';
+  static const imagemProdutoName = 'imagem_produto';
+  static const idMarcaName = 'id_marca';
+  static const createStringV1 = '''
+      CREATE TABLE $tableName (
+        $idProdutoName INTEGER PRIMARY KEY,
+        $nomeProdutoName TEXT NOT NULL,
+        $descricaoProdutoName TEXT,
+        $imagemProdutoName TEXT,
+        $idMarcaName INTEGER, 
+        FOREIGN KEY ($idMarcaName) REFERENCES ${MarcaTable.tableName} (${MarcaTable.idMarcaName})
+      );''';
+  ProdutoTable._();
+}
+
 class Produto extends Entity implements IForeignKey {
   int idProduto;
   String nomeProduto;
@@ -16,7 +35,7 @@ class Produto extends Entity implements IForeignKey {
       required this.descricaoProduto,
       required this.imagemProduto,
       required this.idMarca})
-      : super(tableName: 'produto');
+      : super(tableName: ProdutoTable.tableName);
   Produto.fromMap(Map<dynamic, dynamic> map)
       : this(
           idProduto: map['id_produto'],

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:help_mei/entities/marca.dart';
+import 'package:help_mei/entities/produto.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -68,16 +69,8 @@ class SqliteService {
   }
 
   void _createTableProdutoV1(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS produto;');
-    batch.execute('''
-      CREATE TABLE produto (
-        id_produto INTEGER PRIMARY KEY,
-        nome_produto TEXT NOT NULL,
-        descricao_produto TEXT,
-        imagem_produto TEXT,
-        id_marca INTEGER, 
-        FOREIGN KEY (id_marca) REFERENCES marca (id_marca)
-      );''');
+    batch.execute('DROP TABLE IF EXISTS ${ProdutoTable.tableName};');
+    batch.execute(ProdutoTable.createStringV1);
   }
 
   void _createTableProdutoCategoriaV1(Batch batch) {

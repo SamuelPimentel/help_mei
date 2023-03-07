@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:help_mei/entities/marca.dart';
@@ -5,6 +6,8 @@ import 'package:help_mei/entities/produto.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../entities/tipo_fornecimento.dart';
 
 class SqliteService {
   static const _databaseName = 'HelpMeiData.db';
@@ -51,7 +54,12 @@ class SqliteService {
     _createTriggerAtualizaSaldoCompraV1(batch);
     _createTriggerAtualizaSaldoVendaV1(batch);
     _inicializaTipoMovimentacaoV1(batch);
+    _createTableTipoFornecimentoV1(batch);
     await batch.commit();
+  }
+
+  void _createTableTipoFornecimentoV1(Batch batch) {
+    batch.execute(TipoFornecimentoTable.createStringV1);
   }
 
   void _createTableMarcaV1(Batch batch) {

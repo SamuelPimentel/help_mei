@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:help_mei/entities/fornecedor.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
 import 'package:path/path.dart';
@@ -55,11 +56,16 @@ class SqliteService {
     _createTriggerAtualizaSaldoVendaV1(batch);
     _inicializaTipoMovimentacaoV1(batch);
     _createTableTipoFornecimentoV1(batch);
+    _createTableFornecedorV1(batch);
     await batch.commit();
   }
 
   void _createTableTipoFornecimentoV1(Batch batch) {
     batch.execute(TipoFornecimentoTable.createStringV1);
+  }
+
+  void _createTableFornecedorV1(Batch batch) {
+    batch.execute(FornecedorTable.createStringV1);
   }
 
   void _createTableMarcaV1(Batch batch) {

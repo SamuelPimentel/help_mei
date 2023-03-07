@@ -30,10 +30,13 @@ class SqliteService {
   Future<Database> initDatabase() async {
     Directory documentDirectory = await getApplicationDocumentsDirectory();
     String databasePath = join(documentDirectory.path, _databaseName);
-    return await openDatabase(databasePath,
-        version: _databaseVersion,
-        onCreate: _onCreate,
-        onConfigure: _onConfigure);
+    return await openDatabase(
+      databasePath,
+      version: _databaseVersion,
+      onCreate: _onCreate,
+      onConfigure: _onConfigure,
+      onUpgrade: _onUpgrade,
+    );
   }
 
   Future _onConfigure(Database db) async {
@@ -57,6 +60,15 @@ class SqliteService {
     _inicializaTipoMovimentacaoV1(batch);
     _createTableTipoFornecimentoV1(batch);
     _createTableFornecedorV1(batch);
+    await batch.commit();
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    Batch batch = db.batch();
+    if (oldVersion == 1) {
+      _createTableTipoFornecimentoV1(batch);
+      _createTableFornecedorV1(batch);
+    }
     await batch.commit();
   }
 

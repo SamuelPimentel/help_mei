@@ -27,6 +27,13 @@ class TipoFornecimento extends Entity {
           idTipoFornecimento: map[TipoFornecimentoTable.idTipoFornecimentoName],
           tipoFornecimento: map[TipoFornecimentoTable.tipoTipoFornecimentoName],
         );
+
+  TipoFornecimento.empty()
+      : this(
+          idTipoFornecimento: 0,
+          tipoFornecimento: '',
+        );
+
   @override
   Entity fromMap(Map map) {
     return TipoFornecimento.fromMap(map);

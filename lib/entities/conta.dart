@@ -1,11 +1,14 @@
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
 import 'package:help_mei/entities/fornecedor.dart';
+import 'package:help_mei/entities/produto.dart';
 
 class ContaTable {
   static const tableName = 'conta';
   static const idContaName = 'id_conta';
   static const idFornecedorName = 'id_fornecedor';
+  static const idProdutoName = 'id_produto';
+  static const descricaoContaName = 'descricao_conta';
   static const valorContaName = 'valor_conta';
   static const totalParcelasName = 'total_parcelas';
   static const dataVencimentoName = 'data_vencimento';
@@ -16,12 +19,15 @@ class ContaTable {
     CREATE TABLE $tableName (
       $idContaName INTEGER PRIMARY KEY,
       $idFornecedorName INTEGER,
+      $idProdutoName INTEGER,
+      $descricaoContaName TEXT,
       $valorContaName REAL,
       $totalParcelasName INTEGER,
       $dataVencimentoName TEXT NOT NULL,
       $quitadaContaName INTEGER,
       $ativaContaName INTEGER,
-      FOREIGN KEY ($idFornecedorName) REFERENCES ${FornecedorTable.tableName} (${FornecedorTable.idFornecedorName})
+      FOREIGN KEY ($idFornecedorName) REFERENCES ${FornecedorTable.tableName} (${FornecedorTable.idFornecedorName}),
+      FOREIGN KEY ($idProdutoName) REFERENCES ${ProdutoTable.tableName} (${ProdutoTable.idProdutoName})
     );''';
   ContaTable._();
 }
@@ -29,16 +35,21 @@ class ContaTable {
 class Conta extends Entity implements IForeignKey {
   int idConta;
   int idFornecedor;
+  int? idProduto;
+  String? descricaoConta;
   double valorConta;
   int totalParcelas;
   DateTime dataVencimento;
   bool quitadaConta;
   bool ativaConta;
   Fornecedor? fornecedor;
+  Produto? produto;
 
   Conta({
     required this.idConta,
     required this.idFornecedor,
+    required this.idProduto,
+    required this.descricaoConta,
     required this.valorConta,
     required this.totalParcelas,
     required this.dataVencimento,
@@ -50,6 +61,8 @@ class Conta extends Entity implements IForeignKey {
       : this(
           idConta: map[ContaTable.idContaName],
           idFornecedor: map[ContaTable.idFornecedorName],
+          idProduto: map[ContaTable.idProdutoName],
+          descricaoConta: map[ContaTable.descricaoContaName],
           valorConta: map[ContaTable.valorContaName],
           totalParcelas: map[ContaTable.totalParcelasName],
           dataVencimento: DateTime.parse(map[ContaTable.dataVencimentoName]),
@@ -65,6 +78,8 @@ class Conta extends Entity implements IForeignKey {
           quitadaConta: false,
           totalParcelas: 0,
           valorConta: 0,
+          descricaoConta: null,
+          idProduto: null,
         );
 
   @override
@@ -88,6 +103,8 @@ class Conta extends Entity implements IForeignKey {
   Map<String, dynamic> toMap() {
     return {
       ContaTable.idContaName: idConta,
+      ContaTable.idProdutoName: idProduto,
+      ContaTable.descricaoContaName: descricaoConta,
       ContaTable.idFornecedorName: idFornecedor,
       ContaTable.valorContaName: valorConta,
       ContaTable.totalParcelasName: totalParcelas,
@@ -108,6 +125,14 @@ class Conta extends Entity implements IForeignKey {
         },
       ),
     );
+    foreignKeys.add(
+      ForeignKey(
+        tableEntity: Produto.empty(),
+        keys: {
+          ProdutoTable.idProdutoName: idProduto,
+        },
+      ),
+    );
 
     return foreignKeys;
   }
@@ -115,5 +140,6 @@ class Conta extends Entity implements IForeignKey {
   @override
   void insertForeignValues(Map<String, dynamic> values) {
     fornecedor = values[FornecedorTable.tableName];
+    produto = values[ProdutoTable.tableName];
   }
 }

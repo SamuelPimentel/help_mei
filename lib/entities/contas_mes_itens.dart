@@ -26,10 +26,10 @@ class ContaMesItensTable {
       $dataPagamentoName TEXT,
       $numeroParcelaName INTEGER,
       $valorPagoName INTEGER,
-      PRIMARY KEY ($idContasMesItensName, $idContasMesName)
+      PRIMARY KEY ($idContasMesItensName, $idContasMesName),
 
       FOREIGN KEY ($idContasMesName) REFERENCES ${ContasMesTable.tableName} (${ContasMesTable.idContasMesName}),
-      FOREIGN KEY ($idContaName) REFERENCES ${ContaTable.tableName} (${ContaTable.idContaName}),
+      FOREIGN KEY ($idContaName) REFERENCES ${ContaTable.tableName} (${ContaTable.idContaName})
     );''';
 
   ContaMesItensTable._();

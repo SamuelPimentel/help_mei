@@ -74,7 +74,7 @@ class Fornecedor extends Entity implements IForeignKey {
     foreignKeys.add(ForeignKey(
       tableEntity: TipoFornecimento.empty(),
       keys: {
-        FornecedorTable.idTipoFornecedorName: idTipoFornecedor,
+        TipoFornecimentoTable.idTipoFornecimentoName: idTipoFornecedor,
       },
     ));
     return foreignKeys;
@@ -83,5 +83,22 @@ class Fornecedor extends Entity implements IForeignKey {
   @override
   void insertForeignValues(Map<String, dynamic> values) {
     tipoFornecimento = values[TipoFornecimentoTable.tableName];
+  }
+
+  @override
+  bool operator ==(other) {
+    if (other is! Fornecedor) {
+      return false;
+    }
+    return idFornecedor == other.idFornecedor &&
+        nomeFornecedor == other.nomeFornecedor &&
+        idFornecedor == other.idFornecedor;
+  }
+
+  @override
+  int get hashCode {
+    return idFornecedor.hashCode +
+        nomeFornecedor.hashCode +
+        idTipoFornecedor.hashCode;
   }
 }

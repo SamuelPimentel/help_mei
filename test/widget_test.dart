@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
+import 'package:help_mei/entities/fornecedor.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
 import 'package:help_mei/entities/tipo_fornecimento.dart';
@@ -83,5 +84,29 @@ void main() {
     await controller.updateEntity(tipoFonecimento);
     result = await controller.getEntity(tipoFonecimento);
     expect((result as TipoFornecimento), tipoFonecimento);
+  });
+
+  test('fornecedor', () async {
+    EntityControllerGeneric controller = EntityControllerGeneric(
+      service: SqliteServiceInMemory(),
+    );
+
+    var tipoFonecimento = TipoFornecimento(
+      idTipoFornecimento: 1,
+      tipoFornecimento: 'energia',
+    );
+    await controller.insertEntity(tipoFonecimento);
+
+    var fornecedor = Fornecedor(
+      idFornecedor: 1,
+      nomeFornecedor: 'Enel',
+      idTipoFornecedor: 1,
+    );
+    fornecedor.tipoFornecimento = tipoFonecimento;
+
+    await controller.insertEntity(fornecedor);
+    var result = await controller.getEntity(fornecedor);
+    expect((result as Fornecedor), fornecedor);
+    expect(result.tipoFornecimento, tipoFonecimento);
   });
 }

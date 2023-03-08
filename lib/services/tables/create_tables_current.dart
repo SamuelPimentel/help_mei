@@ -1,111 +1,39 @@
-import 'dart:io';
-
-import 'package:help_mei/entities/conta.dart';
-import 'package:help_mei/entities/contas_mes.dart';
-import 'package:help_mei/entities/contas_mes_itens.dart';
-import 'package:help_mei/entities/fornecedor.dart';
-import 'package:help_mei/entities/marca.dart';
-import 'package:help_mei/entities/produto.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../entities/tipo_fornecimento.dart';
+import '../../entities/conta.dart';
+import '../../entities/contas_mes.dart';
+import '../../entities/contas_mes_itens.dart';
+import '../../entities/fornecedor.dart';
+import '../../entities/marca.dart';
+import '../../entities/produto.dart';
+import '../../entities/tipo_fornecimento.dart';
 
-class SqliteService {
-  static const _databaseName = 'HelpMeiData.db';
-  static const _databaseVersion = 1;
-  static Database? _database;
-
-  SqliteService._privateConstructor();
-  static final SqliteService instance = SqliteService._privateConstructor();
-
-  Future<Database> get database async {
-    if (_database != null) {
-      return _database!;
-    }
-
-    _database = await initDatabase();
-    return _database!;
-  }
-
-  Future<Database> initDatabase() async {
-    Directory documentDirectory = await getApplicationDocumentsDirectory();
-    String databasePath = join(documentDirectory.path, _databaseName);
-    return await openDatabase(
-      databasePath,
-      version: _databaseVersion,
-      onCreate: _onCreate,
-      onConfigure: _onConfigure,
-      onUpgrade: _onUpgrade,
-    );
-  }
-
-  Future _onConfigure(Database db) async {
-    await db.execute('PRAGMA foreign_keys = ON');
-  }
-
-  Future _onCreate(Database db, int version) async {
-    var batch = db.batch();
-    _createTableMarcaV1(batch);
-    _createTableCategoriaV1(batch);
-    _createTableProdutoV1(batch);
-    _createTableProdutoCategoriaV1(batch);
-    _createTableTipoMovimentacaoV1(batch);
-    _createTableEntradaSaidaV1(batch);
-    _createTableSaldosV1(batch);
-    _createTableHistoricoSaldoV1(batch);
-    _createTableTotais(batch);
-    _createTriggerInicializaSaldoV1(batch);
-    _createTriggerAtualizaSaldoCompraV1(batch);
-    _createTriggerAtualizaSaldoVendaV1(batch);
-    _inicializaTipoMovimentacaoV1(batch);
-    _createTableTipoFornecimentoV1(batch);
-    _createTableFornecedorV1(batch);
-    _createTableContasMesV1(batch);
-    _createTableContaV1(batch);
-    _createTableContasMesItensV1(batch);
-    await batch.commit();
-  }
-
-  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    Batch batch = db.batch();
-    if (oldVersion == 1) {
-      _createTableTipoFornecimentoV1(batch);
-      _createTableFornecedorV1(batch);
-      _createTableContasMesV1(batch);
-      _createTableContaV1(batch);
-      _createTableContasMesItensV1(batch);
-    }
-    await batch.commit();
-  }
-
-  void _createTableContasMesItensV1(Batch batch) {
+class CreateTablesCurrent {
+  void createTableContasMesItensV1(Batch batch) {
     batch.execute(ContaMesItensTable.createStringV1);
   }
 
-  void _createTableContaV1(Batch batch) {
+  void createTableContaV1(Batch batch) {
     batch.execute(ContaTable.createStringV1);
   }
 
-  void _createTableContasMesV1(Batch batch) {
+  void createTableContasMesV1(Batch batch) {
     batch.execute(ContasMesTable.createStringV1);
   }
 
-  void _createTableTipoFornecimentoV1(Batch batch) {
+  void createTableTipoFornecimentoV1(Batch batch) {
     batch.execute(TipoFornecimentoTable.createStringV1);
   }
 
-  void _createTableFornecedorV1(Batch batch) {
+  void createTableFornecedorV1(Batch batch) {
     batch.execute(FornecedorTable.createStringV1);
   }
 
-  void _createTableMarcaV1(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS ${MarcaTable.tableName};');
+  void createTableMarcaV1(Batch batch) {
     batch.execute(MarcaTable.createStringV1);
   }
 
-  void _createTableCategoriaV1(Batch batch) {
+  void createTableCategoriaV1(Batch batch) {
     batch.execute('DROP TABLE IF EXISTS categoria;');
     batch.execute('''
     CREATE TABLE categoria (
@@ -114,12 +42,11 @@ class SqliteService {
     );''');
   }
 
-  void _createTableProdutoV1(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS ${ProdutoTable.tableName};');
+  void createTableProdutoV1(Batch batch) {
     batch.execute(ProdutoTable.createStringV1);
   }
 
-  void _createTableProdutoCategoriaV1(Batch batch) {
+  void createTableProdutoCategoriaV1(Batch batch) {
     batch.execute('DROP TABLE IF EXISTS produto_categoria;');
     batch.execute('''
       CREATE TABLE produto_categoria (
@@ -134,7 +61,7 @@ class SqliteService {
       );''');
   }
 
-  void _createTableTipoMovimentacaoV1(Batch batch) {
+  void createTableTipoMovimentacaoV1(Batch batch) {
     batch.execute('DROP TABLE IF EXISTS tipo_movimentacao;');
     batch.execute('''
       CREATE TABLE tipo_movimentacao (
@@ -143,7 +70,7 @@ class SqliteService {
       );''');
   }
 
-  void _createTableEntradaSaidaV1(Batch batch) {
+  void createTableEntradaSaidaV1(Batch batch) {
     batch.execute('DROP TABLE IF EXISTS entrada_saida;');
     batch.execute('''
       CREATE TABLE entrada_saida (
@@ -160,7 +87,7 @@ class SqliteService {
       );''');
   }
 
-  void _createTableSaldosV1(Batch batch) {
+  void createTableSaldosV1(Batch batch) {
     batch.execute('DROP TABLE IF EXISTS saldos;');
     batch.execute('''
       CREATE TABLE saldos (
@@ -172,7 +99,7 @@ class SqliteService {
       );''');
   }
 
-  void _createTableHistoricoSaldoV1(Batch batch) {
+  void createTableHistoricoSaldoV1(Batch batch) {
     batch.execute('DROP TABLE IF EXISTS historico_saldo;');
     batch.execute('''
       CREATE TABLE historico_saldo (
@@ -188,7 +115,7 @@ class SqliteService {
       );''');
   }
 
-  void _createTableTotais(Batch batch) {
+  void createTableTotais(Batch batch) {
     batch.execute('DROP TABLE IF EXISTS totais;');
     batch.execute('''
       CREATE TABLE totais (
@@ -203,7 +130,7 @@ class SqliteService {
       );''');
   }
 
-  void _createTriggerInicializaSaldoV1(Batch batch) {
+  void createTriggerInicializaSaldoV1(Batch batch) {
     batch.execute('DROP TRIGGER IF EXISTS inicializa_saldo;');
     batch.execute('''
       CREATE TRIGGER inicializa_saldo AFTER INSERT ON produto
@@ -214,7 +141,7 @@ class SqliteService {
       ''');
   }
 
-  void _createTriggerAtualizaSaldoCompraV1(Batch batch) {
+  void createTriggerAtualizaSaldoCompraV1(Batch batch) {
     batch.execute('DROP TRIGGER IF EXISTS atualiza_saldo_compra;');
     batch.execute('''
       CREATE TRIGGER atualiza_saldo_compra AFTER INSERT ON entrada_saida
@@ -227,7 +154,7 @@ class SqliteService {
       ''');
   }
 
-  void _createTriggerAtualizaSaldoVendaV1(Batch batch) {
+  void createTriggerAtualizaSaldoVendaV1(Batch batch) {
     batch.execute('DROP TRIGGER IF EXISTS atualiza_saldo_venda;');
     batch.execute('''
       CREATE TRIGGER atualiza_saldo_venda AFTER INSERT ON entrada_saida
@@ -239,7 +166,7 @@ class SqliteService {
       ''');
   }
 
-  void _inicializaTipoMovimentacaoV1(Batch batch) {
+  void inicializaTipoMovimentacaoV1(Batch batch) {
     batch.execute(
         'INSERT INTO tipo_movimentacao (id_tipo_movimentacao, nome_tipo_movimentacao) VALUES(1, "compra");');
     batch.execute(

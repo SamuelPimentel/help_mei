@@ -48,4 +48,17 @@ class Marca extends Entity {
   Entity fromMap(Map map) {
     return Marca.fromMap(map);
   }
+
+  @override
+  bool operator ==(other) {
+    if (other is! Marca) {
+      return false;
+    }
+    return idMarca == (other).idMarca && nomeMarca == other.nomeMarca;
+  }
+
+  @override
+  int get hashCode {
+    return idMarca.hashCode + nomeMarca.hashCode;
+  }
 }

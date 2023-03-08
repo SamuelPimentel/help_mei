@@ -38,11 +38,11 @@ class Produto extends Entity implements IForeignKey {
       : super(tableName: ProdutoTable.tableName);
   Produto.fromMap(Map<dynamic, dynamic> map)
       : this(
-          idProduto: map['id_produto'],
-          nomeProduto: map['nome_produto'],
-          descricaoProduto: map['descricao_produto'],
-          imagemProduto: map['imagem_produto'],
-          idMarca: map['id_marca'],
+          idProduto: map[ProdutoTable.idProdutoName],
+          nomeProduto: map[ProdutoTable.nomeProdutoName],
+          descricaoProduto: map[ProdutoTable.descricaoProdutoName],
+          imagemProduto: map[ProdutoTable.imagemProdutoName],
+          idMarca: map[ProdutoTable.idMarcaName],
         );
   Produto.empty()
       : this(
@@ -61,23 +61,23 @@ class Produto extends Entity implements IForeignKey {
   @override
   Map<String, String> getPrimaryKeys() {
     return {
-      'id_produto': idProduto.toString(),
+      ProdutoTable.idProdutoName: idProduto.toString(),
     };
   }
 
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
-    idProduto = keys['id_produto'];
+    idProduto = keys[ProdutoTable.idProdutoName];
   }
 
   @override
   Map<String, dynamic> toMap() {
     return {
-      'id_produto': idProduto,
-      'nome_produto': nomeProduto,
-      'descricao_produto': descricaoProduto,
-      'imagem_produto': imagemProduto,
-      'id_marca': idMarca,
+      ProdutoTable.idProdutoName: idProduto,
+      ProdutoTable.nomeProdutoName: nomeProduto,
+      ProdutoTable.descricaoProdutoName: descricaoProduto,
+      ProdutoTable.imagemProdutoName: imagemProduto,
+      ProdutoTable.idMarcaName: idMarca,
     };
   }
 
@@ -87,7 +87,7 @@ class Produto extends Entity implements IForeignKey {
     foreignKeys.add(
       ForeignKey(
         tableEntity: Marca.empty(),
-        keys: {'id_marca': idMarca},
+        keys: {MarcaTable.idMarcaName: idMarca},
       ),
     );
     return foreignKeys;
@@ -95,6 +95,27 @@ class Produto extends Entity implements IForeignKey {
 
   @override
   void insertForeignValues(Map<String, dynamic> values) {
-    marca = values['marca'];
+    marca = values[MarcaTable.tableName];
+  }
+
+  @override
+  bool operator ==(other) {
+    if (other is! Produto) {
+      return false;
+    }
+    return idProduto == other.idProduto &&
+        nomeProduto == other.nomeProduto &&
+        descricaoProduto == other.descricaoProduto &&
+        imagemProduto == other.imagemProduto &&
+        idMarca == other.idMarca;
+  }
+
+  @override
+  int get hashCode {
+    return idProduto.hashCode +
+        nomeProduto.hashCode +
+        descricaoProduto.hashCode +
+        imagemProduto.hashCode +
+        idMarca.hashCode;
   }
 }

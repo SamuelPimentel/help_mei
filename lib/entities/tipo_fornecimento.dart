@@ -59,4 +59,18 @@ class TipoFornecimento extends Entity {
       TipoFornecimentoTable.tipoTipoFornecimentoName: tipoFornecimento,
     };
   }
+
+  @override
+  bool operator ==(other) {
+    if (other is! TipoFornecimento) {
+      return false;
+    }
+    return idTipoFornecimento == other.idTipoFornecimento &&
+        tipoFornecimento == other.tipoFornecimento;
+  }
+
+  @override
+  int get hashCode {
+    return idTipoFornecimento.hashCode + tipoFornecimento.hashCode;
+  }
 }

@@ -1,16 +1,37 @@
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
+import 'package:help_mei/entities/irequest_new_primary_key.dart';
 import 'package:help_mei/services/database_service.dart';
 import 'package:sqflite/sqflite.dart';
-
-import '../services/sqlite_service.dart';
 
 class EntityControllerGeneric {
   DatabaseService service;
   EntityControllerGeneric({required this.service});
   Future insertEntity(Entity entity) async {
     Database db = await service.database;
-    await db.insert(entity.tableName, entity.toMap());
+    try {
+      await db.insert(entity.tableName, entity.toMap());
+    } catch (ex) {
+      if (ex is DatabaseException) {
+        if (ex.isUniqueConstraintError()) {
+          var result = await getEntity(entity);
+          if (result != null) {
+            if (entity is IRequestNewPrimaryKey) {
+              (entity as IRequestNewPrimaryKey).requestNewPrimaryKeys();
+              await insertEntity(entity);
+            } else {
+              rethrow;
+            }
+          } else {
+            rethrow;
+          }
+        } else {
+          rethrow;
+        }
+      } else {
+        rethrow;
+      }
+    }
   }
 
   Future deleteEntity(Entity entity) async {
@@ -69,6 +90,16 @@ class EntityControllerGeneric {
   Future<Map<String, dynamic>> _getForeignValues(Entity entity) async {
     Map<String, dynamic> values = {};
     for (var key in (entity as IForeignKey).getForeignKeys()) {
+      bool isnull = false;
+      for (var v in key.keys.values) {
+        if (v == null) {
+          isnull = true;
+          break;
+        }
+      }
+      if (isnull) {
+        continue;
+      }
       var value = await getEntity(key.tableEntity);
       if (value != null) {
         values[value.tableName] = value;

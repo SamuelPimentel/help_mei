@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/contas_mes.dart';
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
+
+import '../helpers/constantes.dart';
 
 class ContaMesItensTable {
   static const tableName = 'contas_mes_itens';

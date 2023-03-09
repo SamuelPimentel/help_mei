@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:help_mei/entities/entity.dart';
+import 'package:help_mei/entities/irequest_new_primary_key.dart';
+import 'package:help_mei/helpers/constantes.dart';
 
 class TipoFornecimentoTable {
   static const tableName = 'tipo_fornecimento';
@@ -13,7 +17,7 @@ class TipoFornecimentoTable {
   TipoFornecimentoTable._();
 }
 
-class TipoFornecimento extends Entity {
+class TipoFornecimento extends Entity implements IRequestNewPrimaryKey {
   int idTipoFornecimento;
   String tipoFornecimento;
 
@@ -50,6 +54,12 @@ class TipoFornecimento extends Entity {
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
     idTipoFornecimento = keys[TipoFornecimentoTable.idTipoFornecimentoName];
+  }
+
+  @override
+  void requestNewPrimaryKeys() {
+    var rnd = Random();
+    idTipoFornecimento = rnd.nextInt(maxInt32);
   }
 
   @override

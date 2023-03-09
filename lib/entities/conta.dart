@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
 import 'package:help_mei/entities/fornecedor.dart';
+import 'package:help_mei/entities/irequest_new_primary_key.dart';
 import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/helpers/constantes.dart';
 
 class ContaTable {
   static const tableName = 'conta';
@@ -32,7 +36,7 @@ class ContaTable {
   ContaTable._();
 }
 
-class Conta extends Entity implements IForeignKey {
+class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   int idConta;
   int idFornecedor;
   int? idProduto;
@@ -42,8 +46,27 @@ class Conta extends Entity implements IForeignKey {
   DateTime dataVencimento;
   bool quitadaConta;
   bool ativaConta;
-  Fornecedor? fornecedor;
-  Produto? produto;
+  Fornecedor? _fornecedor;
+
+  Fornecedor? get fornecedor => _fornecedor;
+
+  set fornecedor(Fornecedor? value) {
+    _fornecedor = value;
+    if (value != null) {
+      idFornecedor = value.idFornecedor;
+    }
+  }
+
+  Produto? _produto;
+
+  Produto? get produto => _produto;
+
+  set produto(Produto? value) {
+    _produto = value;
+    if (value != null) {
+      idProduto = value.idProduto;
+    }
+  }
 
   Conta({
     required this.idConta,
@@ -125,14 +148,16 @@ class Conta extends Entity implements IForeignKey {
         },
       ),
     );
-    foreignKeys.add(
-      ForeignKey(
-        tableEntity: Produto.empty(),
-        keys: {
-          ProdutoTable.idProdutoName: idProduto,
-        },
-      ),
-    );
+    if (idProduto != null) {
+      foreignKeys.add(
+        ForeignKey(
+          tableEntity: Produto.empty(),
+          keys: {
+            ProdutoTable.idProdutoName: idProduto,
+          },
+        ),
+      );
+    }
 
     return foreignKeys;
   }
@@ -141,5 +166,40 @@ class Conta extends Entity implements IForeignKey {
   void insertForeignValues(Map<String, dynamic> values) {
     fornecedor = values[FornecedorTable.tableName];
     produto = values[ProdutoTable.tableName];
+  }
+
+  @override
+  bool operator ==(other) {
+    if (other is! Conta) {
+      return false;
+    }
+    return idConta == other.idConta &&
+        idFornecedor == other.idFornecedor &&
+        idProduto == other.idProduto &&
+        descricaoConta == other.descricaoConta &&
+        valorConta == other.valorConta &&
+        totalParcelas == other.totalParcelas &&
+        dataVencimento == other.dataVencimento &&
+        quitadaConta == other.quitadaConta &&
+        ativaConta == other.ativaConta;
+  }
+
+  @override
+  int get hashCode {
+    return idConta.hashCode +
+        idFornecedor.hashCode +
+        idProduto.hashCode +
+        descricaoConta.hashCode +
+        valorConta.hashCode +
+        totalParcelas.hashCode +
+        dataVencimento.hashCode +
+        quitadaConta.hashCode +
+        ativaConta.hashCode;
+  }
+
+  @override
+  void requestNewPrimaryKeys() {
+    var rnd = Random();
+    idConta = rnd.nextInt(maxInt32);
   }
 }

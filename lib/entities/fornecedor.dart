@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
+import 'package:help_mei/entities/irequest_new_primary_key.dart';
 import 'package:help_mei/entities/tipo_fornecimento.dart';
+import 'package:help_mei/helpers/constantes.dart';
 
 class FornecedorTable {
   static const tableName = 'fornecedor';
@@ -18,11 +22,20 @@ class FornecedorTable {
   FornecedorTable._();
 }
 
-class Fornecedor extends Entity implements IForeignKey {
+class Fornecedor extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   int idFornecedor;
   String nomeFornecedor;
   int idTipoFornecedor;
-  TipoFornecimento? tipoFornecimento;
+  TipoFornecimento? _tipoFornecimento;
+
+  TipoFornecimento? get tipoFornecimento => _tipoFornecimento;
+
+  set tipoFornecimento(TipoFornecimento? value) {
+    _tipoFornecimento = value;
+    if (value != null) {
+      idTipoFornecedor = value.idTipoFornecimento;
+    }
+  }
 
   Fornecedor({
     required this.idFornecedor,
@@ -57,6 +70,12 @@ class Fornecedor extends Entity implements IForeignKey {
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
     idFornecedor = keys[FornecedorTable.idFornecedorName];
+  }
+
+  @override
+  void requestNewPrimaryKeys() {
+    var rnd = Random();
+    idFornecedor = rnd.nextInt(maxInt32);
   }
 
   @override

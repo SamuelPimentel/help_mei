@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
+import 'package:help_mei/entities/irequest_new_primary_key.dart';
 import 'package:help_mei/entities/marca.dart';
+import 'package:help_mei/helpers/constantes.dart';
 
 class ProdutoTable {
   static const tableName = 'produto';
@@ -21,13 +25,22 @@ class ProdutoTable {
   ProdutoTable._();
 }
 
-class Produto extends Entity implements IForeignKey {
+class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   int idProduto;
   String nomeProduto;
   String descricaoProduto;
   String? imagemProduto;
   int idMarca;
-  Marca? marca;
+  Marca? _marca;
+
+  Marca? get marca => _marca;
+
+  set marca(Marca? value) {
+    _marca = value;
+    if (value != null) {
+      idMarca = value.idMarca;
+    }
+  }
 
   Produto(
       {required this.idProduto,
@@ -68,6 +81,12 @@ class Produto extends Entity implements IForeignKey {
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
     idProduto = keys[ProdutoTable.idProdutoName];
+  }
+
+  @override
+  void requestNewPrimaryKeys() {
+    var rnd = Random();
+    idProduto = rnd.nextInt(maxInt32);
   }
 
   @override

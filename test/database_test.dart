@@ -177,8 +177,6 @@ void main() {
     fornecedor2.tipoFornecimento = tipoFonecimento2;
 
     await controller.insertEntity(fornecedor2);
-    print(
-        'Fornecedor: ${fornecedor2.idFornecedor} - ${fornecedor2.nomeFornecedor}');
 
     var conta2 = Conta(
       idConta: 1,
@@ -197,7 +195,5 @@ void main() {
     await controller.insertEntity(conta2);
     result = await controller.getEntity(conta2);
     expect((result as Conta), conta2);
-    print(
-        'Conta: ${conta2.idConta} - ${conta2.produto!.descricaoProduto} R\$${conta2.valorConta}');
   });
 }

@@ -45,7 +45,7 @@ class EntityControllerGeneric {
     await db.update(entity.tableName, entity.toMap(),
         where: _recoverWhere(entity), whereArgs: _recoverWhereArgs(entity));
   }
-
+/*
   Future<Entity?> getEntity(Entity entity) async {
     Database db = await service.database;
     List<Map> maps = await db.query(
@@ -63,6 +63,45 @@ class EntityControllerGeneric {
       return en;
     }
     return null;
+  }*/
+
+  Future<Entity?> getEntity(Entity entity) async {
+    var result = await getEntitiesWhere(entity, entity.getPrimaryKeys());
+    if (result.isEmpty) return null;
+    return result.first;
+  }
+
+  Future<Entity?> getEntityWhere(
+      Entity entity, Map<String, String> whereArgs) async {
+    var result = await getEntitiesWhere(entity, whereArgs);
+    if (result.isEmpty) return null;
+    return result.first;
+  }
+
+  Future<List<Entity>> getEntitiesWhere(
+      Entity entity, Map<String, String> whereArgs) async {
+    Database db = await service.database;
+    List<Map<String, dynamic>> maps = await db.query(
+      entity.tableName,
+      where: _generateWhere(whereArgs),
+      whereArgs: _generateWhereArgs(whereArgs),
+    );
+    var entities = maps.map((e) => entity.fromMap(e)).toList();
+
+    for (var entity in entities) {
+      if (entity is IForeignKey) {
+        Map<String, dynamic> values = {};
+        for (var key in (entity as IForeignKey).getForeignKeys()) {
+          var value = await getEntity(key.tableEntity);
+          if (value != null) {
+            values[value.tableName] = value;
+          }
+        }
+
+        (entity as IForeignKey).insertForeignValues(values);
+      }
+    }
+    return entities;
   }
 
   Future<List<Entity>> getEntities(Entity entity) async {
@@ -106,6 +145,26 @@ class EntityControllerGeneric {
       }
     }
     return values;
+  }
+
+  String _generateWhere(Map<String, String> args) {
+    String where = '';
+    for (var val in args.keys) {
+      if (where.isNotEmpty) {
+        where = '$where, $val = ?';
+      } else {
+        where = '$val = ?';
+      }
+    }
+    return where;
+  }
+
+  List<String> _generateWhereArgs(Map<String, String> args) {
+    List<String> whereArgs = [];
+    for (var val in args.values) {
+      whereArgs.add(val);
+    }
+    return whereArgs;
   }
 
   String _recoverWhere(Entity entity) {

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:help_mei/pages/cadastro_conta_page.dart';
 import 'package:help_mei/pages/home_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -16,7 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(MaterialApp(
-    home: HomePage(),
+    home: CadastroContaPage(),
     theme: buildTheme(),
   ));
 }
@@ -28,6 +29,13 @@ ThemeData buildTheme() {
         primary: periwinle,
         secondary: maize,
       ),
+      appBarTheme: const AppBarTheme(
+          backgroundColor: periwinle,
+          titleTextStyle: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Roboto',
+              fontSize: 30,
+              fontWeight: FontWeight.bold)),
       scaffoldBackgroundColor: vanDykePaper,
       primaryColor: periwinle);
 }

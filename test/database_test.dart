@@ -11,6 +11,7 @@ import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/fornecedor.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/entities/tipo_fornecimento.dart';
 
 import 'package:help_mei/services/sqite_service_in_memory.dart';
@@ -111,6 +112,17 @@ void main() {
     expect(result.tipoFornecimento, tipoFonecimento);
   });
 
+  test('tipoConta', () async {
+    EntityControllerGeneric controller = EntityControllerGeneric(
+      service: SqliteServiceInMemory(),
+    );
+    var tipoConta = TipoConta.noPrimaryKey(nomeTipoConta: 'Conta de luz');
+    await controller.insertEntity(tipoConta);
+    var result = await controller.getEntity(tipoConta);
+    expect(tipoConta, (result as TipoConta));
+    print('id: ${tipoConta.idTipoConta} nome: ${tipoConta.nomeTipoConta}');
+  });
+
   test('conta', () async {
     EntityControllerGeneric controller = EntityControllerGeneric(
       service: SqliteServiceInMemory(),
@@ -118,7 +130,7 @@ void main() {
 
     var conta = Conta(
       idConta: 1,
-      idFornecedor: 1,
+      idTipoConta: 1,
       idProduto: null,
       descricaoConta: 'conta de luz',
       valorConta: 150,
@@ -128,26 +140,14 @@ void main() {
       ativaConta: true,
     );
 
-    var tipoFonecimento = TipoFornecimento(
-      idTipoFornecimento: 1,
-      tipoFornecimento: 'energia',
-    );
-    await controller.insertEntity(tipoFonecimento);
-
-    var fornecedor = Fornecedor(
-      idFornecedor: 1,
-      nomeFornecedor: 'Enel',
-      idTipoFornecedor: 1,
-    );
-    fornecedor.tipoFornecimento = tipoFonecimento;
-
-    await controller.insertEntity(fornecedor);
-    conta.fornecedor = fornecedor;
+    var tipoConta = TipoConta.noPrimaryKey(nomeTipoConta: 'Conta de luz');
+    await controller.insertEntity(tipoConta);
+    conta.tipoConta = tipoConta;
 
     await controller.insertEntity(conta);
     var result = await controller.getEntity(conta);
     expect((result as Conta), conta);
-    expect(result.fornecedor, fornecedor);
+    expect(result.tipoConta, tipoConta);
 
     var marca = Marca(idMarca: 1, nomeMarca: 'Lacta');
     await controller.insertEntity(marca);
@@ -160,27 +160,15 @@ void main() {
       idMarca: 1,
     );
     produto.marca = marca;
-
     await controller.insertEntity(produto);
 
-    var tipoFonecimento2 = TipoFornecimento(
-      idTipoFornecimento: 2,
-      tipoFornecimento: 'mercado',
-    );
-    await controller.insertEntity(tipoFonecimento2);
+    var tipoConta2 = TipoConta.noPrimaryKey(nomeTipoConta: 'Atacadão');
 
-    var fornecedor2 = Fornecedor(
-      idFornecedor: 1,
-      nomeFornecedor: 'Atacadão',
-      idTipoFornecedor: 2,
-    );
-    fornecedor2.tipoFornecimento = tipoFonecimento2;
-
-    await controller.insertEntity(fornecedor2);
+    await controller.insertEntity(tipoConta2);
 
     var conta2 = Conta(
       idConta: 1,
-      idFornecedor: 2,
+      idTipoConta: 2,
       idProduto: 1,
       descricaoConta: null,
       valorConta: 49.99,
@@ -189,7 +177,7 @@ void main() {
       quitadaConta: false,
       ativaConta: true,
     );
-    conta2.fornecedor = fornecedor2;
+    conta2.tipoConta = tipoConta2;
     conta2.produto = produto;
 
     await controller.insertEntity(conta2);

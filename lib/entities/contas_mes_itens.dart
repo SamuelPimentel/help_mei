@@ -1,39 +1,35 @@
-import 'dart:math';
-
 import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/contas_mes.dart';
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
 
-import '../helpers/constantes.dart';
-
 class ContaMesItensTable {
   static const tableName = 'contas_mes_itens';
-  static const idContasMesItensName = 'id_contas_mes_itens';
-  static const idContasMesName = 'id_contas_mes';
-  static const idContaName = 'id_conta';
-  static const descricaoItemName = 'descricao_item';
-  static const valorParcelaName = 'valor_parcela';
-  static const vencimentoName = 'vencimento';
-  static const dataPagamentoName = 'data_pagamento';
-  static const numeroParcelaName = 'numero_parcela';
-  static const valorPagoName = 'valor_pago';
+  static const columnIdContasMesItens = 'id_contas_mes_itens';
+  static const columnIdContasMes = 'id_contas_mes';
+  static const columnIdConta = 'id_conta';
+  static const columnDescricaoItem = 'descricao_item';
+  static const columnValorParcela = 'valor_parcela';
+  static const columnVencimento = 'vencimento';
+  static const columnDataPagamento = 'data_pagamento';
+  static const columnNumeroParcela = 'numero_parcela';
+  static const columnValorPago = 'valor_pago';
 
   static const createStringV1 = '''
     CREATE TABLE $tableName (
-      $idContasMesItensName INTEGER,
-      $idContasMesName INTEGER,
-      $idContaName INTEGER,
-      $descricaoItemName TEXT,
-      $valorParcelaName REAL,
-      $vencimentoName TEXT NOT NULL,
-      $dataPagamentoName TEXT,
-      $numeroParcelaName INTEGER,
-      $valorPagoName INTEGER,
-      PRIMARY KEY ($idContasMesItensName, $idContasMesName),
+      $columnIdContasMesItens INTEGER,
+      $columnIdContasMes INTEGER,
+      $columnIdConta INTEGER,
+      $columnDescricaoItem TEXT,
+      $columnValorParcela REAL,
+      $columnVencimento TEXT NOT NULL,
+      $columnDataPagamento TEXT,
+      $columnNumeroParcela INTEGER,
+      $columnValorPago INTEGER,
+      PRIMARY KEY ($columnIdContasMesItens, $columnIdContasMes),
 
-      FOREIGN KEY ($idContasMesName) REFERENCES ${ContasMesTable.tableName} (${ContasMesTable.idContasMesName}),
-      FOREIGN KEY ($idContaName) REFERENCES ${ContaTable.tableName} (${ContaTable.idContaName})
+      FOREIGN KEY ($columnIdContasMes) REFERENCES ${ContasMesTable.tableName} (${ContasMesTable.columnIdContasMes}),
+      FOREIGN KEY ($columnIdConta) REFERENCES ${ContaTable.tableName} (${ContaTable.columnIdConta})
     );''';
 
   ContaMesItensTable._();
@@ -65,17 +61,17 @@ class ContaMesItens extends Entity implements IForeignKey {
 
   ContaMesItens.fromMap(Map map)
       : this(
-          idContasMesItens: map[ContaMesItensTable.idContasMesItensName],
-          idContasMes: map[ContaMesItensTable.idContasMesName],
-          idConta: map[ContaMesItensTable.idContaName],
-          descricaoItem: map[ContaMesItensTable.descricaoItemName],
-          valorParcela: map[ContaMesItensTable.valorParcelaName],
-          vencimento: DateTime.parse(map[ContaMesItensTable.vencimentoName]),
-          dataPagamento: map[ContaMesItensTable.dataPagamentoName] == null
+          idContasMesItens: map[ContaMesItensTable.columnIdContasMesItens],
+          idContasMes: map[ContaMesItensTable.columnIdContasMes],
+          idConta: map[ContaMesItensTable.columnIdConta],
+          descricaoItem: map[ContaMesItensTable.columnDescricaoItem],
+          valorParcela: map[ContaMesItensTable.columnValorParcela],
+          vencimento: DateTime.parse(map[ContaMesItensTable.columnVencimento]),
+          dataPagamento: map[ContaMesItensTable.columnDataPagamento] == null
               ? null
-              : DateTime.parse(map[ContaMesItensTable.dataPagamentoName]),
-          numeroParcela: map[ContaMesItensTable.numeroParcelaName],
-          valorPago: map[ContaMesItensTable.valorPagoName] == 1,
+              : DateTime.parse(map[ContaMesItensTable.columnDataPagamento]),
+          numeroParcela: map[ContaMesItensTable.columnNumeroParcela],
+          valorPago: map[ContaMesItensTable.columnValorPago] == 1,
         );
   ContaMesItens.empty()
       : this(
@@ -98,29 +94,29 @@ class ContaMesItens extends Entity implements IForeignKey {
   @override
   Map<String, String> getPrimaryKeys() {
     return {
-      ContaMesItensTable.idContasMesItensName: idContasMesItens.toString(),
-      ContaMesItensTable.idContasMesName: idContasMes.toString(),
+      ContaMesItensTable.columnIdContasMesItens: idContasMesItens.toString(),
+      ContaMesItensTable.columnIdContasMes: idContasMes.toString(),
     };
   }
 
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
-    idContasMesItens = keys[ContaMesItensTable.idContasMesItensName];
-    idContasMes = keys[ContaMesItensTable.idContasMesName];
+    idContasMesItens = keys[ContaMesItensTable.columnIdContasMesItens];
+    idContasMes = keys[ContaMesItensTable.columnIdContasMes];
   }
 
   @override
   Map<String, dynamic> toMap() {
     return {
-      ContaMesItensTable.idContasMesItensName: idContasMesItens,
-      ContaMesItensTable.idContasMesName: idContasMes,
-      ContaMesItensTable.idContaName: idConta,
-      ContaMesItensTable.descricaoItemName: descricaoItem,
-      ContaMesItensTable.valorParcelaName: valorParcela,
-      ContaMesItensTable.vencimentoName: vencimento.toIso8601String(),
-      ContaMesItensTable.dataPagamentoName: dataPagamento,
-      ContaMesItensTable.numeroParcelaName: numeroParcela,
-      ContaMesItensTable.valorPagoName: valorPago ? 1 : 0,
+      ContaMesItensTable.columnIdContasMesItens: idContasMesItens,
+      ContaMesItensTable.columnIdContasMes: idContasMes,
+      ContaMesItensTable.columnIdConta: idConta,
+      ContaMesItensTable.columnDescricaoItem: descricaoItem,
+      ContaMesItensTable.columnValorParcela: valorParcela,
+      ContaMesItensTable.columnVencimento: vencimento.toIso8601String(),
+      ContaMesItensTable.columnDataPagamento: dataPagamento,
+      ContaMesItensTable.columnNumeroParcela: numeroParcela,
+      ContaMesItensTable.columnValorPago: valorPago ? 1 : 0,
     };
   }
 
@@ -131,7 +127,7 @@ class ContaMesItens extends Entity implements IForeignKey {
       ForeignKey(
         tableEntity: Conta.empty(),
         keys: {
-          ContaTable.idContaName: idConta,
+          ContaTable.columnIdConta: idConta,
         },
       ),
     );

@@ -5,22 +5,23 @@ import 'package:help_mei/entities/foreign_key.dart';
 import 'package:help_mei/entities/irequest_new_primary_key.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/helpers/constantes.dart';
+import 'package:help_mei/helpers/helper.dart';
 
 class ProdutoTable {
   static const tableName = 'produto';
-  static const idProdutoName = 'id_produto';
-  static const nomeProdutoName = 'nome_produto';
-  static const descricaoProdutoName = 'descricao_produto';
+  static const columnIdProduto = 'id_produto';
+  static const columnNomeProduto = 'nome_produto';
+  static const columnDescricaoProduto = 'descricao_produto';
   static const imagemProdutoName = 'imagem_produto';
-  static const idMarcaName = 'id_marca';
+  static const columnIdMarca = 'id_marca';
   static const createStringV1 = '''
       CREATE TABLE $tableName (
-        $idProdutoName INTEGER PRIMARY KEY,
-        $nomeProdutoName TEXT NOT NULL,
-        $descricaoProdutoName TEXT,
-        $imagemProdutoName TEXT,
-        $idMarcaName INTEGER, 
-        FOREIGN KEY ($idMarcaName) REFERENCES ${MarcaTable.tableName} (${MarcaTable.idMarcaName})
+        $columnIdProduto ${SqliteTipos.integer} ${SqlitePropriedades.primaryKey},
+        $columnNomeProduto ${SqliteTipos.text} ${SqlitePropriedades.notNull},
+        $columnDescricaoProduto ${SqliteTipos.text},
+        $imagemProdutoName ${SqliteTipos.text},
+        $columnIdMarca ${SqliteTipos.integer}, 
+        FOREIGN KEY ($columnIdMarca) REFERENCES ${MarcaTable.tableName} (${MarcaTable.columnIdMarca})
       );''';
   ProdutoTable._();
 }
@@ -49,13 +50,27 @@ class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
       required this.imagemProduto,
       required this.idMarca})
       : super(tableName: ProdutoTable.tableName);
+
+  Produto.noPrimaryKey({
+    required String nomeProduto,
+    required String descricaoProduto,
+    required String? imagemProduto,
+    required int idMarca,
+  }) : this(
+          idProduto: nextPrimaryKey(),
+          nomeProduto: nomeProduto,
+          descricaoProduto: descricaoProduto,
+          imagemProduto: imagemProduto,
+          idMarca: idMarca,
+        );
+
   Produto.fromMap(Map<dynamic, dynamic> map)
       : this(
-          idProduto: map[ProdutoTable.idProdutoName],
-          nomeProduto: map[ProdutoTable.nomeProdutoName],
-          descricaoProduto: map[ProdutoTable.descricaoProdutoName],
+          idProduto: map[ProdutoTable.columnIdProduto],
+          nomeProduto: map[ProdutoTable.columnNomeProduto],
+          descricaoProduto: map[ProdutoTable.columnDescricaoProduto],
           imagemProduto: map[ProdutoTable.imagemProdutoName],
-          idMarca: map[ProdutoTable.idMarcaName],
+          idMarca: map[ProdutoTable.columnIdMarca],
         );
   Produto.empty()
       : this(
@@ -74,13 +89,13 @@ class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   @override
   Map<String, String> getPrimaryKeys() {
     return {
-      ProdutoTable.idProdutoName: idProduto.toString(),
+      ProdutoTable.columnIdProduto: idProduto.toString(),
     };
   }
 
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
-    idProduto = keys[ProdutoTable.idProdutoName];
+    idProduto = keys[ProdutoTable.columnIdProduto];
   }
 
   @override
@@ -92,11 +107,11 @@ class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   @override
   Map<String, dynamic> toMap() {
     return {
-      ProdutoTable.idProdutoName: idProduto,
-      ProdutoTable.nomeProdutoName: nomeProduto,
-      ProdutoTable.descricaoProdutoName: descricaoProduto,
+      ProdutoTable.columnIdProduto: idProduto,
+      ProdutoTable.columnNomeProduto: nomeProduto,
+      ProdutoTable.columnDescricaoProduto: descricaoProduto,
       ProdutoTable.imagemProdutoName: imagemProduto,
-      ProdutoTable.idMarcaName: idMarca,
+      ProdutoTable.columnIdMarca: idMarca,
     };
   }
 
@@ -106,7 +121,7 @@ class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     foreignKeys.add(
       ForeignKey(
         tableEntity: Marca.empty(),
-        keys: {MarcaTable.idMarcaName: idMarca},
+        keys: {MarcaTable.columnIdMarca: idMarca},
       ),
     );
     return foreignKeys;

@@ -5,40 +5,58 @@ import 'package:help_mei/entities/foreign_key.dart';
 import 'package:help_mei/entities/fornecedor.dart';
 import 'package:help_mei/entities/irequest_new_primary_key.dart';
 import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/helpers/constantes.dart';
+import 'package:help_mei/helpers/helper.dart';
 
 class ContaTable {
   static const tableName = 'conta';
-  static const idContaName = 'id_conta';
+  static const columnIdConta = 'id_conta';
   static const idFornecedorName = 'id_fornecedor';
-  static const idProdutoName = 'id_produto';
-  static const descricaoContaName = 'descricao_conta';
-  static const valorContaName = 'valor_conta';
-  static const totalParcelasName = 'total_parcelas';
-  static const dataVencimentoName = 'data_vencimento';
-  static const quitadaContaName = 'quitada_conta';
-  static const ativaContaName = 'ativa_conta';
+  static const columnIdTipoConta = 'id_tipo_conta';
+  static const columnIdProduto = 'id_produto';
+  static const columnDescricaoConta = 'descricao_conta';
+  static const columnValorConta = 'valor_conta';
+  static const columnTotalParcelas = 'total_parcelas';
+  static const columnDataVencimento = 'data_vencimento';
+  static const columnQuitadaConta = 'quitada_conta';
+  static const columnAtivaConta = 'ativa_conta';
 
   static const createStringV1 = '''
     CREATE TABLE $tableName (
-      $idContaName INTEGER PRIMARY KEY,
+      $columnIdConta INTEGER PRIMARY KEY,
       $idFornecedorName INTEGER,
-      $idProdutoName INTEGER,
-      $descricaoContaName TEXT,
-      $valorContaName REAL,
-      $totalParcelasName INTEGER,
-      $dataVencimentoName TEXT NOT NULL,
-      $quitadaContaName INTEGER,
-      $ativaContaName INTEGER,
+      $columnIdProduto INTEGER,
+      $columnDescricaoConta TEXT,
+      $columnValorConta REAL,
+      $columnTotalParcelas INTEGER,
+      $columnDataVencimento TEXT NOT NULL,
+      $columnQuitadaConta INTEGER,
+      $columnAtivaConta INTEGER,
       FOREIGN KEY ($idFornecedorName) REFERENCES ${FornecedorTable.tableName} (${FornecedorTable.idFornecedorName}),
-      FOREIGN KEY ($idProdutoName) REFERENCES ${ProdutoTable.tableName} (${ProdutoTable.idProdutoName})
+      FOREIGN KEY ($columnIdProduto) REFERENCES ${ProdutoTable.tableName} (${ProdutoTable.columnIdProduto})
+    );''';
+
+  static const createStringV2 = '''
+    CREATE TABLE $tableName (
+      $columnIdConta ${SqliteTipos.integer} ${SqlitePropriedades.primaryKey},
+      $columnIdTipoConta ${SqliteTipos.integer},
+      $columnIdProduto ${SqliteTipos.integer},
+      $columnDescricaoConta TEXT,
+      $columnValorConta REAL,
+      $columnTotalParcelas INTEGER,
+      $columnDataVencimento TEXT NOT NULL,
+      $columnQuitadaConta INTEGER,
+      $columnAtivaConta INTEGER,
+      FOREIGN KEY ($columnIdTipoConta) REFERENCES ${TipoContaTable.tableName} (${TipoContaTable.columnIdTipoConta}),
+      FOREIGN KEY ($columnIdProduto) REFERENCES ${ProdutoTable.tableName} (${ProdutoTable.columnIdProduto})
     );''';
   ContaTable._();
 }
 
 class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   int idConta;
-  int idFornecedor;
+  int idTipoConta;
   int? idProduto;
   String? descricaoConta;
   double valorConta;
@@ -46,21 +64,18 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   DateTime dataVencimento;
   bool quitadaConta;
   bool ativaConta;
+
   Fornecedor? _fornecedor;
-
   Fornecedor? get fornecedor => _fornecedor;
-
   set fornecedor(Fornecedor? value) {
     _fornecedor = value;
     if (value != null) {
-      idFornecedor = value.idFornecedor;
+      idTipoConta = value.idFornecedor;
     }
   }
 
   Produto? _produto;
-
   Produto? get produto => _produto;
-
   set produto(Produto? value) {
     _produto = value;
     if (value != null) {
@@ -68,9 +83,18 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     }
   }
 
+  TipoConta? _tipoConta;
+  TipoConta? get tipoConta => _tipoConta;
+  set tipoConta(TipoConta? value) {
+    _tipoConta = value;
+    if (value != null) {
+      idTipoConta = value.idTipoConta;
+    }
+  }
+
   Conta({
     required this.idConta,
-    required this.idFornecedor,
+    required this.idTipoConta,
     required this.idProduto,
     required this.descricaoConta,
     required this.valorConta,
@@ -80,24 +104,44 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     required this.ativaConta,
   }) : super(tableName: ContaTable.tableName);
 
+  Conta.noPrimaryKey({
+    required idTipoConta,
+    required idProduto,
+    required descricaoConta,
+    required valorConta,
+    required totalParcelas,
+    required dataVencimento,
+    required quitadaConta,
+    required ativaConta,
+  }) : this(
+            idConta: nextPrimaryKey(),
+            idTipoConta: idTipoConta,
+            idProduto: idProduto,
+            descricaoConta: descricaoConta,
+            valorConta: valorConta,
+            totalParcelas: totalParcelas,
+            dataVencimento: dataVencimento,
+            quitadaConta: quitadaConta,
+            ativaConta: ativaConta);
+
   Conta.fromMap(Map map)
       : this(
-          idConta: map[ContaTable.idContaName],
-          idFornecedor: map[ContaTable.idFornecedorName],
-          idProduto: map[ContaTable.idProdutoName],
-          descricaoConta: map[ContaTable.descricaoContaName],
-          valorConta: map[ContaTable.valorContaName],
-          totalParcelas: map[ContaTable.totalParcelasName],
-          dataVencimento: DateTime.parse(map[ContaTable.dataVencimentoName]),
-          quitadaConta: map[ContaTable.quitadaContaName] == 1,
-          ativaConta: map[ContaTable.ativaContaName] == 1,
+          idConta: map[ContaTable.columnIdConta],
+          idTipoConta: map[ContaTable.columnIdTipoConta],
+          idProduto: map[ContaTable.columnIdProduto],
+          descricaoConta: map[ContaTable.columnDescricaoConta],
+          valorConta: map[ContaTable.columnValorConta],
+          totalParcelas: map[ContaTable.columnTotalParcelas],
+          dataVencimento: DateTime.parse(map[ContaTable.columnDataVencimento]),
+          quitadaConta: map[ContaTable.columnQuitadaConta] == 1,
+          ativaConta: map[ContaTable.columnAtivaConta] == 1,
         );
   Conta.empty()
       : this(
           ativaConta: false,
           dataVencimento: DateTime.now(),
           idConta: 0,
-          idFornecedor: 0,
+          idTipoConta: 0,
           quitadaConta: false,
           totalParcelas: 0,
           valorConta: 0,
@@ -113,27 +157,27 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   @override
   Map<String, String> getPrimaryKeys() {
     return {
-      ContaTable.idContaName: idConta.toString(),
+      ContaTable.columnIdConta: idConta.toString(),
     };
   }
 
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
-    idConta = keys[ContaTable.idContaName];
+    idConta = keys[ContaTable.columnIdConta];
   }
 
   @override
   Map<String, dynamic> toMap() {
     return {
-      ContaTable.idContaName: idConta,
-      ContaTable.idProdutoName: idProduto,
-      ContaTable.descricaoContaName: descricaoConta,
-      ContaTable.idFornecedorName: idFornecedor,
-      ContaTable.valorContaName: valorConta,
-      ContaTable.totalParcelasName: totalParcelas,
-      ContaTable.dataVencimentoName: dataVencimento.toIso8601String(),
-      ContaTable.quitadaContaName: quitadaConta == true ? 1 : 0,
-      ContaTable.ativaContaName: ativaConta == true ? 1 : 0,
+      ContaTable.columnIdConta: idConta,
+      ContaTable.columnIdProduto: idProduto,
+      ContaTable.columnDescricaoConta: descricaoConta,
+      ContaTable.columnIdTipoConta: idTipoConta,
+      ContaTable.columnValorConta: valorConta,
+      ContaTable.columnTotalParcelas: totalParcelas,
+      ContaTable.columnDataVencimento: dataVencimento.toIso8601String(),
+      ContaTable.columnQuitadaConta: quitadaConta == true ? 1 : 0,
+      ContaTable.columnAtivaConta: ativaConta == true ? 1 : 0,
     };
   }
 
@@ -142,9 +186,9 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     List<ForeignKey> foreignKeys = [];
     foreignKeys.add(
       ForeignKey(
-        tableEntity: Fornecedor.empty(),
+        tableEntity: TipoConta.empty(),
         keys: {
-          FornecedorTable.idFornecedorName: idFornecedor,
+          TipoContaTable.columnIdTipoConta: idTipoConta,
         },
       ),
     );
@@ -153,7 +197,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
         ForeignKey(
           tableEntity: Produto.empty(),
           keys: {
-            ProdutoTable.idProdutoName: idProduto,
+            ProdutoTable.columnIdProduto: idProduto,
           },
         ),
       );
@@ -164,7 +208,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
 
   @override
   void insertForeignValues(Map<String, dynamic> values) {
-    fornecedor = values[FornecedorTable.tableName];
+    tipoConta = values[TipoContaTable.tableName];
     produto = values[ProdutoTable.tableName];
   }
 
@@ -174,7 +218,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
       return false;
     }
     return idConta == other.idConta &&
-        idFornecedor == other.idFornecedor &&
+        idTipoConta == other.idTipoConta &&
         idProduto == other.idProduto &&
         descricaoConta == other.descricaoConta &&
         valorConta == other.valorConta &&
@@ -187,7 +231,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   @override
   int get hashCode {
     return idConta.hashCode +
-        idFornecedor.hashCode +
+        idTipoConta.hashCode +
         idProduto.hashCode +
         descricaoConta.hashCode +
         valorConta.hashCode +

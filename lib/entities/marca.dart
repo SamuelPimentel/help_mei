@@ -3,15 +3,16 @@ import 'dart:math';
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/irequest_new_primary_key.dart';
 import 'package:help_mei/helpers/constantes.dart';
+import 'package:help_mei/helpers/helper.dart';
 
 class MarcaTable {
   static const tableName = 'marca';
-  static const idMarcaName = 'id_marca';
-  static const nomeMarcaName = 'nome_marca';
+  static const columnIdMarca = 'id_marca';
+  static const columnNomeMarca = 'nome_marca';
   static const createStringV1 = '''
       CREATE TABLE $tableName (
-        $idMarcaName INTEGER PRIMARY KEY,
-        $nomeMarcaName TEXT NOT NULL UNIQUE
+        $columnIdMarca ${SqliteTipos.integer} ${SqlitePropriedades.primaryKey},
+        $columnNomeMarca ${SqliteTipos.text} ${SqlitePropriedades.notNull} ${SqlitePropriedades.unique}
       );''';
   MarcaTable._();
 }
@@ -23,29 +24,35 @@ class Marca extends Entity implements IRequestNewPrimaryKey {
   Marca({required this.idMarca, required this.nomeMarca})
       : super(tableName: MarcaTable.tableName);
 
+  Marca.noPrimaryKey({required String nomeMarca})
+      : this(
+          idMarca: nextPrimaryKey(),
+          nomeMarca: nomeMarca,
+        );
+
   Marca.fromMap(Map<dynamic, dynamic> map)
       : this(
-            idMarca: map[MarcaTable.idMarcaName],
-            nomeMarca: map[MarcaTable.nomeMarcaName]);
+            idMarca: map[MarcaTable.columnIdMarca],
+            nomeMarca: map[MarcaTable.columnNomeMarca]);
 
   Marca.empty() : this(idMarca: 0, nomeMarca: "");
 
   @override
   Map<String, dynamic> toMap() {
     return {
-      MarcaTable.idMarcaName: idMarca,
-      MarcaTable.nomeMarcaName: nomeMarca
+      MarcaTable.columnIdMarca: idMarca,
+      MarcaTable.columnNomeMarca: nomeMarca
     };
   }
 
   @override
   Map<String, String> getPrimaryKeys() {
-    return {MarcaTable.idMarcaName: idMarca.toString()};
+    return {MarcaTable.columnIdMarca: idMarca.toString()};
   }
 
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
-    idMarca = keys[MarcaTable.idMarcaName];
+    idMarca = keys[MarcaTable.columnIdMarca];
   }
 
   @override

@@ -14,7 +14,7 @@ import '../entities/tipo_fornecimento.dart';
 
 class SqliteService {
   static const _databaseName = 'HelpMeiData.db';
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
   static Database? _database;
 
   SqliteService._privateConstructor();

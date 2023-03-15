@@ -23,6 +23,7 @@ class OnUpgradeCurrent implements IOnUpgrade {
       batch.execute('DROP TABLE ${FornecedorTable.tableName};');
       batch.execute('DROP TABLE ${ContaTable.tableName};');
       tables.createTableTipoConta(batch);
+      tables.initializaTipoConta(batch);
       tables.createTableContaV2(batch);
     }
     await batch.commit();

@@ -1,27 +1,31 @@
-import 'package:help_mei/entities/tipo_conta.dart';
+import 'package:help_mei/entities/conta.dart';
+import 'package:help_mei/entities/contas_mes.dart';
+import 'package:help_mei/entities/contas_mes_itens.dart';
+import 'package:help_mei/entities/fornecedor.dart';
+import 'package:help_mei/entities/marca.dart';
+import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/entities/tipo_fornecimento.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../../entities/conta.dart';
-import '../../entities/contas_mes.dart';
-import '../../entities/contas_mes_itens.dart';
-import '../../entities/marca.dart';
-import '../../entities/produto.dart';
-
-class CreateTablesCurrent {
-  void createTableTipoConta(Batch batch) {
-    batch.execute(TipoContaTable.createStringV1);
-  }
-
+class CreateTablesV2 {
   void createTableContasMesItensV1(Batch batch) {
     batch.execute(ContaMesItensTable.createStringV1);
   }
 
-  void createTableContaV2(Batch batch) {
-    batch.execute(ContaTable.createStringV2);
+  void createTableContaV1(Batch batch) {
+    batch.execute(ContaTable.createStringV1);
   }
 
   void createTableContasMesV1(Batch batch) {
     batch.execute(ContasMesTable.createStringV1);
+  }
+
+  void createTableTipoFornecimentoV1(Batch batch) {
+    batch.execute(TipoFornecimentoTable.createStringV1);
+  }
+
+  void createTableFornecedorV1(Batch batch) {
+    batch.execute(FornecedorTable.createStringV1);
   }
 
   void createTableMarcaV1(Batch batch) {

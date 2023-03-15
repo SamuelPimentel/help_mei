@@ -69,4 +69,17 @@ class TipoConta extends Entity implements IRequestNewPrimaryKey {
       TipoContaTable.columnNomeTipoConta: nomeTipoConta,
     };
   }
+
+  @override
+  bool operator ==(other) {
+    if (other is! TipoConta) return false;
+
+    return idTipoConta == other.idTipoConta &&
+        nomeTipoConta == other.nomeTipoConta;
+  }
+
+  @override
+  int get hashCode {
+    return idTipoConta.hashCode + nomeTipoConta.hashCode;
+  }
 }

@@ -22,7 +22,6 @@ class SqliteServiceOnDisk extends DatabaseService {
   factory SqliteServiceOnDisk() => instance;
 
   @override
-  // TODO: implement database
   Future<Database> get database async {
     if (_database != null) {
       return _database!;

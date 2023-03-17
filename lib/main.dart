@@ -23,7 +23,10 @@ void main() async {
       result.map((e) => (e as TipoConta).nomeTipoConta).toList();
 
   runApp(MaterialApp(
-    home: CadastroContaPage(dropDownItens: tipoContaValues),
+    home: CadastroContaPage(
+      dropDownItens: tipoContaValues,
+      controller: controller,
+    ),
     theme: buildTheme(),
   ));
 }

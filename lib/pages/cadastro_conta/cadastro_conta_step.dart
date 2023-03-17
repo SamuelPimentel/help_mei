@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
+import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
-import 'package:help_mei/pages/cadastro_conta/widgets/column_dado_pagamento.dart';
+import 'package:help_mei/pages/cadastro_conta/widgets/checkbox_cadastro.dart';
 import 'package:help_mei/pages/cadastro_conta/widgets/dropdown_cadastro.dart';
-import 'package:help_mei/services/database_service.dart';
-import 'package:help_mei/services/sqlite_service_on_disk.dart';
 import 'package:help_mei/widgets/step_cadastro.dart';
 import 'package:help_mei/widgets/text_field_cadastro.dart';
 import 'package:intl/intl.dart';
 
 class CadastroContaStep extends StatefulWidget {
-  const CadastroContaStep({Key? key, required this.dropDownItens})
+  const CadastroContaStep(
+      {Key? key, required this.dropDownItens, required this.controller})
       : super(key: key);
   final List<String> dropDownItens;
+  final EntityControllerGeneric controller;
   @override
   State<CadastroContaStep> createState() => _CadastroContaStepState();
 }
@@ -20,17 +21,17 @@ class CadastroContaStep extends StatefulWidget {
 class _CadastroContaStepState extends State<CadastroContaStep> {
   int _index = 0;
   String dropdownValue = '';
-
-  EntityControllerGeneric? _controller;
+  bool _ehParcelada = false;
 
   final TextEditingController _dateEditingController = TextEditingController();
   final TextEditingController _valorEditingController = TextEditingController();
+  final TextEditingController _qtdeParcelasEditingController =
+      TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _controller = EntityControllerGeneric(service: SqliteServiceOnDisk());
     widget.dropDownItens.add('Outro');
     dropdownValue = widget.dropDownItens.first;
   }
@@ -53,6 +54,34 @@ class _CadastroContaStepState extends State<CadastroContaStep> {
           if (_index < getSteps().length - 1) {
             setState(() {
               _index += 1;
+            });
+          } else if (_index == getSteps().length - 1) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return const AlertDialog(
+                  title: Text('Cadastrando Usuário'),
+                  content: CircularProgressIndicator(),
+                );
+              },
+            );
+            saveConta().then((value) {
+              String msg = 'Inserido com sucesso';
+              if (!value) {
+                msg = 'Erro ap inserir';
+              }
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Cadastro'),
+                    content: Text(msg),
+                    actions: [
+                      TextButton(onPressed: () {}, child: const Text('ok'))
+                    ],
+                  );
+                },
+              );
             });
           }
         },
@@ -114,34 +143,71 @@ class _CadastroContaStepState extends State<CadastroContaStep> {
                   });
                 }
               },
-            )
+            ),
           ],
         ),
       ),
-      Step(
-        state: _index > 2 ? StepState.complete : StepState.indexed,
-        isActive: _index >= 2,
-        title: Text(
-          'Passo 3',
+      stepCadastro(
+        context,
+        'Parcelamento',
+        _index,
+        2,
+        Column(
+          children: [
+            checkboxCadastro(_ehParcelada, 'A compra será parcelada?', (value) {
+              setState(() {
+                _ehParcelada = value!;
+              });
+            }),
+            if (_ehParcelada)
+              Column(
+                children: [
+                  textFieldCadastro(context, 'Quantidade de parcelas',
+                      const Icon(Icons.payment), _qtdeParcelasEditingController,
+                      keyboardType: TextInputType.number)
+                ],
+              ),
+          ],
         ),
-        content: Container(),
       ),
-      Step(
-        state: _index > 2 ? StepState.complete : StepState.indexed,
-        isActive: _index >= 2,
-        title: Text(
-          'Passo 4',
-        ),
-        content: Container(),
-      ),
-      Step(
-        state: _index > 2 ? StepState.complete : StepState.indexed,
-        isActive: _index >= 2,
-        title: Text(
-          'Passo 3',
-        ),
-        content: Container(),
+      stepCadastro(
+        context,
+        'Finalizar',
+        _index,
+        3,
+        Column(),
       ),
     ];
+  }
+
+  Future<bool> saveConta() async {
+    var res = await widget.controller.getEntities(TipoConta.empty());
+    List<TipoConta> tipoContas = res.map((e) => (e as TipoConta)).toList();
+    var tipoContaSelecionada = tipoContas
+        .where((element) => element.nomeTipoConta == dropdownValue)
+        .first;
+    var valor = double.parse(_valorEditingController.text);
+    int qtdeParcelas = 1;
+    if (_ehParcelada) {
+      qtdeParcelas = int.parse(_qtdeParcelasEditingController.text);
+    }
+
+    var dataVencimento =
+        DateFormat('dd-MM-yyyy').parse(_dateEditingController.text);
+    Conta conta = Conta.noPrimaryKey(
+        idTipoConta: tipoContaSelecionada.idTipoConta,
+        idProduto: null,
+        descricaoConta: '',
+        valorConta: valor,
+        totalParcelas: qtdeParcelas,
+        dataVencimento: dataVencimento,
+        quitadaConta: false,
+        ativaConta: true);
+    try {
+      widget.controller.insertEntity(conta);
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
 }

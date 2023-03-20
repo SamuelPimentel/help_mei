@@ -1,5 +1,5 @@
 const int maxInt32 = 0x7fffffff;
-const databaseVersion = 3;
+const databaseVersion = 4;
 
 class SqliteTipos {
   static const integer = 'INTEGER';

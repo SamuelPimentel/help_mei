@@ -1,5 +1,3 @@
-import 'package:help_mei/entities/categoria.dart';
-import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -9,15 +7,7 @@ import '../../../entities/contas_mes_itens.dart';
 import '../../../entities/marca.dart';
 import '../../../entities/produto.dart';
 
-class CreateTablesCurrent {
-  void createTableCategoria(Batch batch) {
-    batch.execute(CategoriaTable.createStringV1);
-  }
-
-  void createTableProdutoCategoria(Batch batch) {
-    batch.execute(ProdutoCategoriaTable.createsStringV1);
-  }
-
+class CreateTablesV3 {
   void createTableTipoConta(Batch batch) {
     batch.execute(TipoContaTable.createStringV1);
   }
@@ -113,8 +103,32 @@ class CreateTablesCurrent {
     batch.execute(MarcaTable.createStringV1);
   }
 
+  void createTableCategoriaV1(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS categoria;');
+    batch.execute('''
+    CREATE TABLE categoria (
+      id_categoria INTEGER PRIMARY KEY,
+      nome_categoria TEXT NOT NULL UNIQUE
+    );''');
+  }
+
   void createTableProdutoV1(Batch batch) {
     batch.execute(ProdutoTable.createStringV1);
+  }
+
+  void createTableProdutoCategoriaV1(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS produto_categoria;');
+    batch.execute('''
+      CREATE TABLE produto_categoria (
+        id_produto INTEGER,
+        id_produto_categoria INTEGER,
+        id_categoria INTEGER,
+
+        FOREIGN KEY (id_produto) REFERENCES produto (id_produto),
+        FOREIGN KEY (id_categoria) REFERENCES categoria (id_categoria),
+
+        PRIMARY KEY (id_produto, id_produto_categoria)
+      );''');
   }
 
   void createTableTipoMovimentacaoV1(Batch batch) {

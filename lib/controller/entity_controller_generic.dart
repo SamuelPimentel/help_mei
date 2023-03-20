@@ -149,13 +149,17 @@ class EntityControllerGeneric {
 
   String _generateWhere(Map<String, String> args) {
     String where = '';
+
     for (var val in args.keys) {
       if (where.isNotEmpty) {
-        where = '$where, $val = ?';
+        where = '$where AND $val = ?';
       } else {
-        where = '$val = ?';
+        where = '($val = ?';
       }
     }
+
+    where = '$where )';
+
     return where;
   }
 
@@ -164,6 +168,7 @@ class EntityControllerGeneric {
     for (var val in args.values) {
       whereArgs.add(val);
     }
+
     return whereArgs;
   }
 

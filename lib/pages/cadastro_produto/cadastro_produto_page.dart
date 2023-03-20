@@ -14,6 +14,7 @@ class CadastroProdutoPage extends StatelessWidget {
   final EntityControllerGeneric controller;
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _categoriaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,13 @@ class CadastroProdutoPage extends StatelessWidget {
                   context, 'Nome do produto', _nomeController),
               textfieldCadastroProduto(
                   context, 'Descrição do produto', _descricaoController),
+              autoCompleteProduto(
+                _marcaController,
+                marcas.map((marca) {
+                  return marca.nomeMarca;
+                }).toList(),
+                'Marca do produto:',
+              ),
               autoCompleteProduto(
                 _marcaController,
                 marcas.map((marca) {

@@ -7,10 +7,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
+import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/fornecedor.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/entities/tipo_fornecimento.dart';
 
@@ -183,5 +185,44 @@ void main() {
     await controller.insertEntity(conta2);
     result = await controller.getEntity(conta2);
     expect((result as Conta), conta2);
+  });
+
+  test('Categoria', () async {
+    EntityControllerGeneric controller =
+        EntityControllerGeneric(service: SqliteServiceInMemory());
+
+    Categoria categoria =
+        Categoria.noPrimaryKey(nomeCategoria: 'novaCategoria');
+
+    await controller.insertEntity(categoria);
+    var result = await controller.getEntity(categoria) as Categoria;
+    expect(result, categoria);
+  });
+
+  test('ProdutoCategoria', () async {
+    EntityControllerGeneric controller =
+        EntityControllerGeneric(service: SqliteServiceInMemory());
+
+    Categoria categoria =
+        Categoria.noPrimaryKey(nomeCategoria: 'novaCategoria');
+    await controller.insertEntity(categoria);
+
+    Marca marca = Marca.noPrimaryKey(nomeMarca: 'novaMarca');
+    await controller.insertEntity(marca);
+
+    Produto produto = Produto.noPrimaryKey(
+        nomeProduto: 'novoProduto',
+        descricaoProduto: 'novaDescricao',
+        imagemProduto: null,
+        idMarca: marca.idMarca);
+
+    await controller.insertEntity(produto);
+
+    ProdutoCategoria produtoCategoria = ProdutoCategoria.noPrimaryKey(
+        idProduto: produto.idProduto, idCategoria: categoria.idCategoria);
+
+    await controller.insertEntity(produtoCategoria);
+    var prod = await controller.getEntity(produtoCategoria) as ProdutoCategoria;
+    expect(prod, produtoCategoria);
   });
 }

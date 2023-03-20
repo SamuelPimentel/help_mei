@@ -1,14 +1,16 @@
 import 'package:help_mei/services/i_on_create.dart';
-import 'package:help_mei/services/tables/create_tables_current.dart';
+import 'package:help_mei/services/tables/v3/create_tables_V3.dart';
 import 'package:sqflite/sqflite.dart';
 
-class OnCreateCurrent implements IOnCreate {
+class OnCreateV3 implements IOnCreate {
   @override
   Future onCreate(Database db, int version) async {
     Batch batch = db.batch();
-    var tables = CreateTablesCurrent();
+    var tables = CreateTablesV3();
     tables.createTableMarcaV1(batch);
+    tables.createTableCategoriaV1(batch);
     tables.createTableProdutoV1(batch);
+    tables.createTableProdutoCategoriaV1(batch);
     tables.createTableTipoMovimentacaoV1(batch);
     tables.createTableEntradaSaidaV1(batch);
     tables.createTableSaldosV1(batch);
@@ -23,8 +25,6 @@ class OnCreateCurrent implements IOnCreate {
     tables.createTableContasMesV1(batch);
     tables.createTableContaV2(batch);
     tables.createTableContasMesItensV1(batch);
-    tables.createTableCategoria(batch);
-    tables.createTableProdutoCategoria(batch);
     await batch.commit();
   }
 }

@@ -62,6 +62,34 @@ class CadastroProdutoPage extends StatelessWidget {
   }
 
   void _concluirCadastro(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Concluir cadastro?'),
+          content: const Text('Deseja inserir os dados do produto?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                return;
+              },
+              child: const Text('Não'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _cadastraProduto(context);
+              },
+              child: const Text('Sim'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _cadastraProduto(BuildContext context) async {
     var resultado = marcas.where((marca) {
       return (marca.nomeMarca.toLowerCase() ==
           _marcaController.text.toLowerCase());
@@ -86,13 +114,29 @@ class CadastroProdutoPage extends StatelessWidget {
         idMarca: marca.idMarca);
     await controller.insertEntity(produto);
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text(
-              'Produto cadastrado com sucesso!',
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(
+            'Produto cadastrado com sucesso! \n Deseja continuar cadastrando?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(produto);
+              },
+              child: Text('Não'),
             ),
-          );
-        });
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Sim'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

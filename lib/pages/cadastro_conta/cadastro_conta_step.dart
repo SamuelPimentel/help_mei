@@ -175,7 +175,17 @@ class _CadastroContaStepState extends State<CadastroContaStep> {
         'Finalizar',
         _index,
         3,
-        Column(),
+        Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                'Hello',
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ],
+        ),
       ),
     ];
   }

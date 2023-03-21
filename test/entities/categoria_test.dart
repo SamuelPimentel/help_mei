@@ -12,7 +12,7 @@ void sqfliteTestInit() {
 }
 
 void main() {
-  sqfliteFfiInit();
+  sqfliteTestInit();
   WidgetsFlutterBinding.ensureInitialized();
   test('Categoria', () async {
     EntityControllerGeneric controller =
@@ -22,7 +22,17 @@ void main() {
         Categoria.noPrimaryKey(nomeCategoria: 'novaCategoria');
 
     await controller.insertEntity(categoria);
-    var result = await controller.getEntity(categoria) as Categoria;
+    var result = await controller.getEntity(categoria) as Categoria?;
     expect(result, categoria);
+
+    categoria.nomeCategoria = 'Bombom';
+    await controller.updateEntity(categoria);
+
+    result = await controller.getEntity(categoria) as Categoria?;
+    expect(result, categoria);
+
+    await controller.deleteEntity(categoria);
+    result = await controller.getEntity(categoria) as Categoria?;
+    expect(result, null);
   });
 }

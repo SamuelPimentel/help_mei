@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:help_mei/entities/entity.dart';
-import 'package:help_mei/entities/irequest_new_primary_key.dart';
+import 'package:help_mei/entities/interfaces/irequest_new_primary_key.dart';
 import 'package:help_mei/helpers/constantes.dart';
 
 class TipoFornecimentoTable {

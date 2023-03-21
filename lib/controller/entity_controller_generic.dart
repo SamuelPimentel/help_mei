@@ -1,16 +1,31 @@
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
-import 'package:help_mei/entities/irequest_new_primary_key.dart';
+import 'package:help_mei/entities/interfaces/irelationship_multiple.dart';
+import 'package:help_mei/entities/interfaces/irequest_new_primary_key.dart';
+import 'package:help_mei/entities/interfaces/isearch_simple.dart';
 import 'package:help_mei/services/database_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 class EntityControllerGeneric {
   DatabaseService service;
   EntityControllerGeneric({required this.service});
-  Future insertEntity(Entity entity) async {
-    Database db = await service.database;
+  Future insertEntity(Entity entity, [Database? database]) async {
+    Database db;
+    if (database == null) {
+      db = await service.database;
+    } else {
+      db = database;
+    }
     try {
       await db.insert(entity.tableName, entity.toMap());
+      if (entity is IRelationshipMultiple) {
+        var values = (entity as IRelationshipMultiple).insertValues();
+        for (var val in values.keys) {
+          for (var ent in values[val]!) {
+            await insertEntity(ent, db);
+          }
+        }
+      }
     } catch (ex) {
       if (ex is DatabaseException) {
         if (ex.isUniqueConstraintError()) {
@@ -18,7 +33,7 @@ class EntityControllerGeneric {
           if (result != null) {
             if (entity is IRequestNewPrimaryKey) {
               (entity as IRequestNewPrimaryKey).requestNewPrimaryKeys();
-              await insertEntity(entity);
+              await insertEntity(entity, db);
             } else {
               rethrow;
             }
@@ -78,6 +93,23 @@ class EntityControllerGeneric {
     return result.first;
   }
 
+  Future<Entity?> getEntityParameters(Entity entity) async {
+    if (entity is! ISearchSimple) return null;
+
+    var result =
+        await getEntitiesWhere(entity, (entity as ISearchSimple).parameters());
+    if (result.isEmpty) return null;
+    return result.first;
+  }
+
+  Future<List<Entity>> getEntitiesParameters(Entity entity) async {
+    if (entity is! ISearchSimple) return [];
+    var result =
+        await getEntitiesWhere(entity, (entity as ISearchSimple).parameters());
+    if (result.isEmpty) return [];
+    return result;
+  }
+
   Future<List<Entity>> getEntitiesWhere(
       Entity entity, Map<String, String> whereArgs) async {
     Database db = await service.database;
@@ -99,6 +131,16 @@ class EntityControllerGeneric {
         }
 
         (entity as IForeignKey).insertForeignValues(values);
+      }
+      if (entity is IRelationshipMultiple) {
+        var conditions =
+            (entity as IRelationshipMultiple).relationshipSearchCondition();
+        for (var table in conditions.keys) {
+          var values = await getEntitiesWhere(table, conditions[table]!);
+          Map<String, List<Entity>> map = {};
+          map[table.tableName] = values;
+          (entity as IRelationshipMultiple).addRelationshipValues(map);
+        }
       }
     }
     return entities;

@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/entity.dart';
-import 'package:help_mei/entities/irequest_new_primary_key.dart';
+import 'package:help_mei/entities/foreign_key.dart';
+import 'package:help_mei/entities/interfaces/irequest_new_primary_key.dart';
+import 'package:help_mei/entities/interfaces/isearch_simple.dart';
 import 'package:help_mei/entities/produto.dart';
 import 'package:help_mei/helpers/constantes.dart';
 import 'package:help_mei/helpers/helper.dart';
@@ -24,18 +26,48 @@ class ProdutoCategoriaTable {
 
     );
 ''';
+
+  ProdutoCategoriaTable._();
 }
 
-class ProdutoCategoria extends Entity implements IRequestNewPrimaryKey {
-  int idProdutoCategoria;
-  int idCategoria;
-  int idProduto;
+class ProdutoCategoria extends Entity
+    implements IRequestNewPrimaryKey, ISearchSimple, IForeignKey {
+  int? _idProdutoCategoria;
+  int get idProdutoCategoria =>
+      _idProdutoCategoria == null ? 0 : _idProdutoCategoria!;
+  set idProdutoCategoria(int value) {
+    _idProdutoCategoria = value;
+  }
+
+  int? _idCategoria;
+  int get idCategoria => _idCategoria == null ? 0 : _idCategoria!;
+  set idCategoria(int value) {
+    _idCategoria = value;
+  }
+
+  int? _idProduto;
+  int get idProduto => _idProduto == null ? 0 : _idProduto!;
+  set idProduto(int value) {
+    _idProduto = value;
+  }
+
+  Categoria? _categoria;
+  Categoria? get categoria => _categoria;
+  set categoria(Categoria? value) {
+    if (value != null) {
+      idCategoria = value.idCategoria;
+    }
+    _categoria = value;
+  }
 
   ProdutoCategoria(
-      {required this.idProdutoCategoria,
-      required this.idCategoria,
-      required this.idProduto})
-      : super(tableName: ProdutoCategoriaTable.tableName);
+      {required int idProdutoCategoria,
+      required int idCategoria,
+      required int idProduto})
+      : _idProduto = idProduto,
+        _idCategoria = idCategoria,
+        _idProdutoCategoria = idProdutoCategoria,
+        super(tableName: ProdutoCategoriaTable.tableName);
 
   ProdutoCategoria.fromMap(Map map)
       : this(
@@ -53,6 +85,16 @@ class ProdutoCategoria extends Entity implements IRequestNewPrimaryKey {
 
   ProdutoCategoria.empty()
       : this(idCategoria: 0, idProdutoCategoria: 0, idProduto: 0);
+
+  ProdutoCategoria.queryParameters({
+    int? idProdutoCategoria,
+    int? idCategoria,
+    int? idProduto,
+  }) : super(tableName: ProdutoCategoriaTable.tableName) {
+    _idProdutoCategoria = idProdutoCategoria;
+    _idProduto = idProduto;
+    _idCategoria = idCategoria;
+  }
 
   @override
   Entity fromMap(Map map) {
@@ -107,5 +149,39 @@ class ProdutoCategoria extends Entity implements IRequestNewPrimaryKey {
   void requestNewPrimaryKeys() {
     var rnd = Random();
     idProdutoCategoria = rnd.nextInt(maxInt32);
+  }
+
+  @override
+  Map<String, String> parameters() {
+    Map<String, String> parameters = {};
+    if (_idProdutoCategoria != null) {
+      parameters[ProdutoCategoriaTable.columnIdProdutoCategoria] =
+          idProdutoCategoria.toString();
+    }
+    if (_idCategoria != null) {
+      parameters[ProdutoCategoriaTable.columnIdCategoria] =
+          idCategoria.toString();
+    }
+    if (_idProduto != null) {
+      parameters[ProdutoCategoriaTable.columnIdProduto] = idProduto.toString();
+    }
+    return parameters;
+  }
+
+  @override
+  List<ForeignKey> getForeignKeys() {
+    List<ForeignKey> foreignKeys = [];
+    foreignKeys.add(
+      ForeignKey(
+        tableEntity: Categoria.empty(),
+        keys: {CategoriaTable.columnIdCategoria: idCategoria},
+      ),
+    );
+    return foreignKeys;
+  }
+
+  @override
+  void insertForeignValues(Map<String, dynamic> values) {
+    categoria = values[CategoriaTable.tableName];
   }
 }

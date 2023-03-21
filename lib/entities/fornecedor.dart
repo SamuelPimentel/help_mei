@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
-import 'package:help_mei/entities/irequest_new_primary_key.dart';
+import 'package:help_mei/entities/interfaces/irequest_new_primary_key.dart';
 import 'package:help_mei/entities/tipo_fornecimento.dart';
 import 'package:help_mei/helpers/constantes.dart';
 

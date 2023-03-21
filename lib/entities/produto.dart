@@ -1,9 +1,12 @@
 import 'dart:math';
 
+import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
-import 'package:help_mei/entities/irequest_new_primary_key.dart';
+import 'package:help_mei/entities/interfaces/irelationship_multiple.dart';
+import 'package:help_mei/entities/interfaces/irequest_new_primary_key.dart';
 import 'package:help_mei/entities/marca.dart';
+import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/helpers/constantes.dart';
 import 'package:help_mei/helpers/helper.dart';
 
@@ -26,16 +29,37 @@ class ProdutoTable {
   ProdutoTable._();
 }
 
-class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
-  int idProduto;
-  String nomeProduto;
-  String descricaoProduto;
+class Produto extends Entity
+    implements IForeignKey, IRequestNewPrimaryKey, IRelationshipMultiple {
+  int? _idProduto;
+  int get idProduto => _idProduto == null ? 0 : _idProduto!;
+  set idProduto(int value) {
+    _idProduto = value;
+  }
+
+  String? _nomeProduto;
+  String get nomeProduto => _nomeProduto == null ? '' : _nomeProduto!;
+  set nomeProduto(String value) {
+    _nomeProduto = value;
+  }
+
+  String? _descricaoProduto;
+  String get descricaoProduto =>
+      _descricaoProduto == null ? '' : _descricaoProduto!;
+  set descricaoProduto(String value) {
+    _descricaoProduto = value;
+  }
+
   String? imagemProduto;
-  int idMarca;
+
+  int? _idMarca;
+  int get idMarca => _idMarca == null ? 0 : _idMarca!;
+  set idMarca(int value) {
+    _idMarca = value;
+  }
+
   Marca? _marca;
-
   Marca? get marca => _marca;
-
   set marca(Marca? value) {
     _marca = value;
     if (value != null) {
@@ -43,13 +67,19 @@ class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     }
   }
 
+  List<ProdutoCategoria> _produtoCategorias = [];
+
   Produto(
-      {required this.idProduto,
-      required this.nomeProduto,
-      required this.descricaoProduto,
+      {required int idProduto,
+      required String nomeProduto,
+      required String descricaoProduto,
       required this.imagemProduto,
-      required this.idMarca})
-      : super(tableName: ProdutoTable.tableName);
+      required int idMarca})
+      : _idMarca = idMarca,
+        _descricaoProduto = descricaoProduto,
+        _nomeProduto = nomeProduto,
+        _idProduto = idProduto,
+        super(tableName: ProdutoTable.tableName);
 
   Produto.noPrimaryKey({
     required String nomeProduto,
@@ -80,6 +110,41 @@ class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
           nomeProduto: '',
           imagemProduto: null,
         );
+  Produto.queryParameters(
+      {int? idProduto,
+      String? nomeProduto,
+      String? descricaoProduto,
+      this.imagemProduto,
+      int? idMarca})
+      : super(tableName: ProdutoTable.tableName) {
+    _idProduto = idProduto;
+    _nomeProduto = nomeProduto;
+    _descricaoProduto = descricaoProduto;
+    _idMarca = idMarca;
+  }
+
+  void addCategoria(Categoria categoria) {
+    var result = _produtoCategorias
+        .where((element) => element.idCategoria == categoria.idCategoria);
+    if (result.isEmpty) {
+      var prodCat = ProdutoCategoria.noPrimaryKey(
+          idProduto: idProduto, idCategoria: categoria.idCategoria);
+      prodCat.categoria = categoria;
+      _produtoCategorias.add(prodCat);
+    }
+  }
+
+  void addProdutoCategoria(ProdutoCategoria produtoCategoria) {
+    _produtoCategorias.add(produtoCategoria);
+  }
+
+  List<Categoria> get categorias {
+    List<Categoria> categorias = [];
+    for (var cat in _produtoCategorias) {
+      categorias.add(cat.categoria!);
+    }
+    return categorias;
+  }
 
   @override
   Entity fromMap(Map map) {
@@ -151,5 +216,26 @@ class Produto extends Entity implements IForeignKey, IRequestNewPrimaryKey {
         descricaoProduto.hashCode +
         imagemProduto.hashCode +
         idMarca.hashCode;
+  }
+
+  @override
+  void addRelationshipValues(Map<String, List<Entity>> values) {
+    for (var val in values[ProdutoCategoriaTable.tableName]!) {
+      addProdutoCategoria(val as ProdutoCategoria);
+    }
+  }
+
+  @override
+  Map<String, List<Entity>> insertValues() {
+    return {ProdutoCategoriaTable.tableName: _produtoCategorias};
+  }
+
+  @override
+  Map<Entity, Map<String, String>> relationshipSearchCondition() {
+    Map<Entity, Map<String, String>> map = {};
+    map[ProdutoCategoria.empty()] = {
+      ProdutoCategoriaTable.columnIdProduto: idProduto.toString()
+    };
+    return map;
   }
 }

@@ -7,9 +7,10 @@ Widget produtoCard(BuildContext context, Produto produto) {
     child: Row(
       children: [
         const Flexible(
+          flex: 1,
           child: Icon(
             Icons.photo_filter_rounded,
-            size: 35,
+            size: 40,
           ),
         ),
         Flexible(
@@ -42,6 +43,7 @@ Widget produtoCard(BuildContext context, Produto produto) {
           ),
         ),
         Flexible(
+          flex: 1,
           child: Column(
             children: [
               Text('R\$5.00'),

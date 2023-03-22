@@ -24,37 +24,39 @@ class CadastroProdutoPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              textfieldCadastroProduto(
-                  context, 'Nome do produto', _nomeController),
-              textfieldCadastroProduto(
-                  context, 'Descrição do produto', _descricaoController),
-              autoCompleteProduto(
-                _marcaController,
-                marcas.map((marca) {
-                  return marca.nomeMarca;
-                }).toList(),
-                'Marca do produto:',
-              ),
-              autoCompleteProduto(
-                _marcaController,
-                marcas.map((marca) {
-                  return marca.nomeMarca;
-                }).toList(),
-                'Marca do produto:',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    _concluirCadastro(context);
-                  },
-                  child: Text('Cadastrar'))
-            ],
+        child: SingleChildScrollView(
+          child: Card(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                textfieldCadastroProduto(
+                    context, 'Nome do produto', _nomeController),
+                textfieldCadastroProduto(
+                    context, 'Descrição do produto', _descricaoController),
+                autoCompleteProduto(
+                  _marcaController,
+                  marcas.map((marca) {
+                    return marca.nomeMarca;
+                  }).toList(),
+                  'Marca do produto:',
+                ),
+                autoCompleteProduto(
+                  _marcaController,
+                  marcas.map((marca) {
+                    return marca.nomeMarca;
+                  }).toList(),
+                  'Marca do produto:',
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      _concluirCadastro(context);
+                    },
+                    child: Text('Cadastrar'))
+              ],
+            ),
           ),
         ),
       ),

@@ -54,5 +54,28 @@ void main() {
       p = '$p ${cat.nomeCategoria}';
     }
     print(p);
+
+    Categoria salgado = Categoria.noPrimaryKey(nomeCategoria: 'Salgado');
+    await controller.insertEntity(salgado);
+
+    produto.addCategoria(salgado);
+    await controller.updateEntity(produto);
+
+    res = await controller.getEntity(produto);
+    p = '${(res as Produto).nomeProduto} ${res.marca!.nomeMarca}, categorias: ';
+    for (var cat in res.categorias) {
+      p = '$p ${cat.nomeCategoria}';
+    }
+    print(p);
+
+    produto.removeCategoria(salgado);
+    await controller.updateEntity(produto);
+
+    res = await controller.getEntity(produto);
+    p = '${(res as Produto).nomeProduto} ${res.marca!.nomeMarca}, categorias: ';
+    for (var cat in res.categorias) {
+      p = '$p ${cat.nomeCategoria}';
+    }
+    print(p);
   });
 }

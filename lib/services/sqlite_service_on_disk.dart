@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+/// Classe responsável por salvar os dados entrados no aplicativo no banco dados HelpMeiData.db
 class SqliteServiceOnDisk extends DatabaseService {
   static Database? _database;
   static const _databaseName = 'HelpMeiData.db';

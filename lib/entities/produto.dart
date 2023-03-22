@@ -67,7 +67,7 @@ class Produto extends Entity
     }
   }
 
-  List<ProdutoCategoria> _produtoCategorias = [];
+  final List<ProdutoCategoria> _produtoCategorias = [];
 
   Produto(
       {required int idProduto,
@@ -131,6 +131,15 @@ class Produto extends Entity
           idProduto: idProduto, idCategoria: categoria.idCategoria);
       prodCat.categoria = categoria;
       _produtoCategorias.add(prodCat);
+    }
+  }
+
+  void removeCategoria(Categoria categoria) {
+    var r = _produtoCategorias.where(
+      (element) => element.idCategoria == categoria.idCategoria,
+    );
+    if (r.isNotEmpty) {
+      _produtoCategorias.remove(r.first);
     }
   }
 

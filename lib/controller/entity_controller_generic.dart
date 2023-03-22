@@ -52,13 +52,53 @@ class EntityControllerGeneric {
   Future deleteEntity(Entity entity) async {
     Database db = await service.database;
     await db.delete(entity.tableName,
-        where: _recoverWhere(entity), whereArgs: _recoverWhereArgs(entity));
+        where: _generateWhere(entity.getPrimaryKeys()),
+        whereArgs: _generateWhereArgs(entity.getPrimaryKeys()));
+  }
+
+  Future deleteEntityWhere(Entity entity, Map<String, String> whereArgs) async {
+    Database db = await service.database;
+    await db.delete(
+      entity.tableName,
+      where: _generateWhere(whereArgs),
+      whereArgs: _generateWhereArgs(whereArgs),
+    );
   }
 
   Future updateEntity(Entity entity) async {
     Database db = await service.database;
-    await db.update(entity.tableName, entity.toMap(),
-        where: _recoverWhere(entity), whereArgs: _recoverWhereArgs(entity));
+    var oldEntity = await getEntity(entity);
+    if (oldEntity == null) {
+      insertEntity(entity);
+      return;
+    }
+    await db.update(
+      entity.tableName,
+      entity.toMap(),
+      where: _generateWhere(entity.getPrimaryKeys()),
+      whereArgs: _generateWhereArgs(entity.getPrimaryKeys()),
+    );
+    if (entity is IRelationshipMultiple) {
+      var oldMap = (oldEntity as IRelationshipMultiple).insertValues();
+      for (var table in oldMap.keys) {
+        var values = oldMap[table];
+        if (values != null) {
+          for (var v in values) {
+            await deleteEntity(v);
+          }
+        }
+      }
+
+      var map = (entity as IRelationshipMultiple).insertValues();
+      for (var table in map.keys) {
+        var values = map[table];
+        if (values != null) {
+          for (var v in values) {
+            await insertEntity(v, db);
+          }
+        }
+      }
+    }
   }
 /*
   Future<Entity?> getEntity(Entity entity) async {
@@ -80,12 +120,14 @@ class EntityControllerGeneric {
     return null;
   }*/
 
+  /// Recupera uma entidade com a chave primária igual a passada pelo parametro
   Future<Entity?> getEntity(Entity entity) async {
     var result = await getEntitiesWhere(entity, entity.getPrimaryKeys());
     if (result.isEmpty) return null;
     return result.first;
   }
 
+  /// Recupera uma entidade que seja igual aos parametros passados
   Future<Entity?> getEntityWhere(
       Entity entity, Map<String, String> whereArgs) async {
     var result = await getEntitiesWhere(entity, whereArgs);

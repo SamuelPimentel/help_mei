@@ -1,5 +1,6 @@
 const int maxInt32 = 0x7fffffff;
 const databaseVersion = 4;
+const helpMeiPath = 'HelpMeiData';
 
 class SqliteTipos {
   static const integer = 'INTEGER';

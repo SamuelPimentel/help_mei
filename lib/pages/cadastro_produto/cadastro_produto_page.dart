@@ -1,20 +1,37 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/helpers/constantes.dart';
+import 'package:help_mei/helpers/helper.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/autocomplete_produto.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/textfield_cadastro_produto.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
-class CadastroProdutoPage extends StatelessWidget {
-  CadastroProdutoPage(
+class CadastroProdutoPage extends StatefulWidget {
+  const CadastroProdutoPage(
       {super.key, required this.marcas, required this.controller});
 
-  final TextEditingController _marcaController = TextEditingController();
   final List<Marca> marcas;
   final EntityControllerGeneric controller;
+
+  @override
+  State<CadastroProdutoPage> createState() => _CadastroProdutoPageState();
+}
+
+class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
+  final TextEditingController _marcaController = TextEditingController();
+
   final TextEditingController _nomeController = TextEditingController();
+
   final TextEditingController _descricaoController = TextEditingController();
+
   final TextEditingController _categoriaController = TextEditingController();
+
+  File? imageFile;
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +46,51 @@ class CadastroProdutoPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                InkWell(
+                  borderRadius: BorderRadius.circular(70),
+                  splashColor: Theme.of(context).colorScheme.secondary,
+                  onTap: () async {
+                    FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.image,
+                      allowedExtensions: ['png', 'jpg', 'jpeg'],
+                    );
+                    if (result != null) {
+                      File image = File(result.files.single.path!);
+                      setState(() {
+                        imageFile = image;
+                      });
+                    }
+                  },
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.white38,
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: imageFile == null
+                            ? const AssetImage('assets/images/waiting.png')
+                                as ImageProvider
+                            : FileImage(imageFile!),
+                      ),
+                    ),
+                  ),
+                ),
                 textfieldCadastroProduto(
                     context, 'Nome do produto', _nomeController),
                 textfieldCadastroProduto(
                     context, 'Descrição do produto', _descricaoController),
                 autoCompleteProduto(
                   _marcaController,
-                  marcas.map((marca) {
+                  widget.marcas.map((marca) {
                     return marca.nomeMarca;
                   }).toList(),
                   'Marca do produto:',
                 ),
                 autoCompleteProduto(
                   _marcaController,
-                  marcas.map((marca) {
+                  widget.marcas.map((marca) {
                     return marca.nomeMarca;
                   }).toList(),
                   'Marca do produto:',
@@ -92,7 +140,7 @@ class CadastroProdutoPage extends StatelessWidget {
   }
 
   void _cadastraProduto(BuildContext context) async {
-    var resultado = marcas.where((marca) {
+    var resultado = widget.marcas.where((marca) {
       return (marca.nomeMarca.toLowerCase() ==
           _marcaController.text.toLowerCase());
     });
@@ -102,19 +150,37 @@ class CadastroProdutoPage extends StatelessWidget {
     if (resultado.isEmpty) {
       var marcaCadastro = Marca.noPrimaryKey(nomeMarca: _marcaController.text);
 
-      await controller.insertEntity(marcaCadastro);
+      await widget.controller.insertEntity(marcaCadastro);
 
       marca = marcaCadastro;
     } else {
       marca = resultado.first;
     }
 
+    String? imagemProduto = null;
+    if (imageFile != null) {
+      String imageName = nextPrimaryKey().toString();
+      Directory documentDirectory = await getApplicationDocumentsDirectory();
+      String imageDirectory =
+          join(documentDirectory.path, '$helpMeiPath/images');
+      Directory imgDirectory = Directory(imageDirectory);
+      var existe = await imgDirectory.exists();
+      if (!existe) {
+        await imgDirectory.create(recursive: true);
+      }
+      //imageFile = await imageFile!.copy(imageDirectory);
+      imageName = '$imageName${extension(imageFile!.path.toString())}';
+      await imageFile!.rename(join(imageDirectory, imageName));
+      imagemProduto = imageName;
+    }
+
     var produto = Produto.noPrimaryKey(
         nomeProduto: _nomeController.text,
         descricaoProduto: _descricaoController.text,
-        imagemProduto: null,
+        imagemProduto: imagemProduto,
         idMarca: marca.idMarca);
-    await controller.insertEntity(produto);
+    await widget.controller.insertEntity(produto);
+
     showDialog(
       context: context,
       builder: (context) {

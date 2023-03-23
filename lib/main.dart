@@ -15,6 +15,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'colors.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   if (Platform.isWindows || Platform.isLinux) {
     sqfliteFfiInit();
@@ -37,6 +39,7 @@ void main() async {
   ).toList();
 
   runApp(MaterialApp(
+    navigatorKey: navigatorKey,
     home: ListarProdutosPage(
       produtos: produtos,
       controller: controller,

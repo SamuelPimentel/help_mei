@@ -6,6 +6,7 @@ import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
 import 'package:help_mei/helpers/constantes.dart';
 import 'package:help_mei/helpers/helper.dart';
+import 'package:help_mei/main.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/autocomplete_produto.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/textfield_cadastro_produto.dart';
 import 'package:path/path.dart';
@@ -129,7 +130,7 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _cadastraProduto(context);
+                _cadastraProduto();
               },
               child: const Text('Sim'),
             ),
@@ -139,7 +140,7 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
     );
   }
 
-  void _cadastraProduto(BuildContext context) async {
+  void _cadastraProduto() async {
     var resultado = widget.marcas.where((marca) {
       return (marca.nomeMarca.toLowerCase() ==
           _marcaController.text.toLowerCase());
@@ -182,25 +183,29 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
     await widget.controller.insertEntity(produto);
 
     showDialog(
-      context: context,
+      context: navigatorKey.currentState!.context,
       builder: (context) {
         return AlertDialog(
-          content: Text(
+          content: const Text(
             'Produto cadastrado com sucesso! \n Deseja continuar cadastrando?',
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop(produto);
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(produto);
+                }
               },
-              child: Text('Não'),
+              child: const Text('Não'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
               },
-              child: Text('Sim'),
+              child: const Text('Sim'),
             ),
           ],
         );

@@ -158,9 +158,16 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
       marca = resultado.first;
     }
 
-    String? imagemProduto = null;
+    var produto = Produto.noPrimaryKey(
+        nomeProduto: _nomeController.text,
+        descricaoProduto: _descricaoController.text,
+        imagemProduto: null,
+        idMarca: marca.idMarca);
+    await widget.controller.insertEntity(produto);
+
+    String? imagemProduto;
     if (imageFile != null) {
-      String imageName = nextPrimaryKey().toString();
+      String imageName = produto.idProduto.toString();
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String imageDirectory =
           join(documentDirectory.path, '$helpMeiPath/images');
@@ -171,16 +178,26 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
       }
       //imageFile = await imageFile!.copy(imageDirectory);
       imageName = '$imageName${extension(imageFile!.path.toString())}';
-      await imageFile!.rename(join(imageDirectory, imageName));
+      try {
+        imageFile = await imageFile!
+            .copy(join(imageDirectory, basename(imageFile!.path)));
+      } catch (e) {
+        debugPrint(e.toString());
+        return;
+      }
+
+      try {
+        await imageFile!.rename(join(imageDirectory, imageName));
+      } catch (e) {
+        debugPrint(e.toString());
+        return;
+      }
+
       imagemProduto = imageName;
     }
 
-    var produto = Produto.noPrimaryKey(
-        nomeProduto: _nomeController.text,
-        descricaoProduto: _descricaoController.text,
-        imagemProduto: imagemProduto,
-        idMarca: marca.idMarca);
-    await widget.controller.insertEntity(produto);
+    produto.imagemProduto = imagemProduto;
+    await widget.controller.updateEntity(produto);
 
     showDialog(
       context: navigatorKey.currentState!.context,

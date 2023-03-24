@@ -6,12 +6,27 @@ Widget produtoCard(BuildContext context, Produto produto) {
     elevation: 5,
     child: Row(
       children: [
-        const Flexible(
+        SizedBox(
+          width: 10,
+        ),
+        Flexible(
           flex: 1,
-          child: Icon(
-            Icons.photo_filter_rounded,
-            size: 40,
+          child: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: produto.imageFile == null
+                    ? const AssetImage('assets/images/waiting.png')
+                        as ImageProvider
+                    : FileImage(produto.imageFile!),
+              ),
+              color: Colors.white38,
+            ),
           ),
+        ),
+        SizedBox(
+          width: 10,
         ),
         Flexible(
           flex: 5,

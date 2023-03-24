@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:help_mei/entities/categoria.dart';
@@ -51,6 +52,7 @@ class Produto extends Entity
   }
 
   String? imagemProduto;
+  File? imageFile;
 
   int? _idMarca;
   int get idMarca => _idMarca == null ? 0 : _idMarca!;

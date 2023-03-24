@@ -33,7 +33,8 @@ class SqliteServiceOnDisk extends DatabaseService {
   @override
   Future<Database> initDatabase() async {
     Directory documentDirectory = await getApplicationDocumentsDirectory();
-    String databasePath = join(documentDirectory.path, _databaseName);
+    String databasePath =
+        join(documentDirectory.path, '$helpMeiPath/$_databaseName');
     return openDatabase(
       databasePath,
       version: databaseVersion,

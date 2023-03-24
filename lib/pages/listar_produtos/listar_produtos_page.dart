@@ -35,20 +35,18 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add_circle_outline_outlined),
+        child: const Icon(Icons.add_circle_outline_outlined),
         onPressed: () async {
-          var result = await Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => CadastroProdutoPage(
                   marcas: widget.marcas, controller: widget.controller),
             ),
           );
-          if (result != null) {
-            setState(() {
-              widget.produtos.add(result as Produto);
-            });
-          }
+          setState(() {
+            getFuture();
+          });
         },
       ),
       body: FutureBuilder(
@@ -75,7 +73,7 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
   Widget buildListView(BuildContext context, AsyncSnapshot snapshot) {
     return ListView.builder(
       padding: const EdgeInsets.all(10),
-      itemCount: widget.produtos.length,
+      itemCount: snapshot.data['produtos'].length,
       itemBuilder: (context, index) {
         return produtoCard(context, snapshot.data['produtos'][index]);
       },

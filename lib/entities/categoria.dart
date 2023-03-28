@@ -16,6 +16,31 @@ class CategoriaTable {
       $columnNomeCategoria ${SqliteTipos.text} ${SqlitePropriedades.unique}
     );''';
 
+  static const initialValues = '''
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (1,"Alimentos básicos");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (2,"Bebidas");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (3,"Limpeza");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (4,"Leites e iogurtes");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (5,"Biscoitos e salgadinhos");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (6,"Frios e laticinios");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (7,"Molhos, condimentos e conservas");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (8,"Higiene e cuidados pessoais");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (9,"Padaria e matinais");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (10,"Carnes, aves e peixes");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (11,"Congelados e resfriados");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (12,"Legumes e vegetais");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (13,"Utensilios para o lar");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (14,"Bebidas alcoólicas");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (15,"Pet-shop");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (16,"Suplementos e vitaminas");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (17,"Bazar e utilidades");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (18,"Suplementos e vitaminas");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (19,"Bazar e utilidades");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (20,"Vestuaário");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (21,"Brinquedos");
+      INSERT INTO $tableName($columnIdCategoria, $columnNomeCategoria) VALUES (22,"Outros");
+''';
+
   CategoriaTable._();
 }
 

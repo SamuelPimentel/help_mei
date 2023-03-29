@@ -10,6 +10,10 @@ import '../../../entities/marca.dart';
 import '../../../entities/produto.dart';
 
 class CreateTablesCurrent {
+  void inicializaTableCategoria(Batch batch) {
+    batch.execute(CategoriaTable.initialValues);
+  }
+
   void createTableCategoria(Batch batch) {
     batch.execute(CategoriaTable.createStringV1);
   }

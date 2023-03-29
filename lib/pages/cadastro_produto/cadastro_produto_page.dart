@@ -11,6 +11,7 @@ import 'package:help_mei/pages/cadastro_produto/widgets/autocomplete_produto.dar
 import 'package:help_mei/pages/cadastro_produto/widgets/textfield_cadastro_produto.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CadastroProdutoPage extends StatefulWidget {
   const CadastroProdutoPage(
@@ -51,10 +52,13 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
                   borderRadius: BorderRadius.circular(70),
                   splashColor: Theme.of(context).colorScheme.secondary,
                   onTap: () async {
+                    var status = await Permission.photos.status;
+                    if (status.isDenied) {
+                      print('não pode acessar');
+                    }
                     FilePickerResult? result =
                         await FilePicker.platform.pickFiles(
                       type: FileType.image,
-                      allowedExtensions: ['png', 'jpg', 'jpeg'],
                     );
                     if (result != null) {
                       File image = File(result.files.single.path!);

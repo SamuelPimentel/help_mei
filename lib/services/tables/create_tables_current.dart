@@ -11,7 +11,9 @@ import '../../../entities/produto.dart';
 
 class CreateTablesCurrent {
   void inicializaTableCategoria(Batch batch) {
-    batch.execute(CategoriaTable.initialValues);
+    for (var v in CategoriaTable.initialValues) {
+      batch.execute(v);
+    }
   }
 
   void createTableCategoria(Batch batch) {

@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
+import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
 import 'package:help_mei/helpers/constantes.dart';
-import 'package:help_mei/helpers/helper.dart';
 import 'package:help_mei/main.dart';
+import 'package:help_mei/pages/cadastro_conta/widgets/dropdown_cadastro.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/autocomplete_produto.dart';
+import 'package:help_mei/pages/cadastro_produto/widgets/dropdown_cadastro.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/textfield_cadastro_produto.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,7 +35,25 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
 
   final TextEditingController _categoriaController = TextEditingController();
 
+  List<Categoria> categorias = [];
+
+  String categoriaValue = "";
+
   File? imageFile;
+
+  @override
+  void initState() {
+    super.initState();
+    initCategorias();
+  }
+
+  void initCategorias() async {
+    var result = await widget.controller.getEntities(Categoria.empty());
+    setState(() {
+      categorias = result.map((e) => e as Categoria).toList();
+      categoriaValue = categorias.first.nomeCategoria;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +72,11 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
                   borderRadius: BorderRadius.circular(70),
                   splashColor: Theme.of(context).colorScheme.secondary,
                   onTap: () async {
-                    var status = await Permission.photos.status;
-                    if (status.isDenied) {
-                      print('não pode acessar');
+                    if (!Platform.isLinux) {
+                      var status = await Permission.photos.status;
+                      if (status.isDenied) {
+                        print('não pode acessar');
+                      }
                     }
                     FilePickerResult? result =
                         await FilePicker.platform.pickFiles(
@@ -93,12 +115,19 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
                   }).toList(),
                   'Marca do produto:',
                 ),
-                autoCompleteProduto(
-                  _marcaController,
-                  widget.marcas.map((marca) {
-                    return marca.nomeMarca;
+                dropDownCadastroPage(
+                  items: categorias.map<DropdownMenuItem<String>>((e) {
+                    return DropdownMenuItem<String>(
+                      value: e.nomeCategoria,
+                      child: Text(e.nomeCategoria),
+                    );
                   }).toList(),
-                  'Marca do produto:',
+                  value: categoriaValue,
+                  onChanged: (value) {
+                    setState(() {
+                      categoriaValue = value!;
+                    });
+                  },
                 ),
                 const SizedBox(
                   height: 20,
@@ -162,11 +191,16 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
       marca = resultado.first;
     }
 
+    var categoria = categorias
+        .where((element) => element.nomeCategoria == categoriaValue)
+        .first;
+
     var produto = Produto.noPrimaryKey(
         nomeProduto: _nomeController.text,
         descricaoProduto: _descricaoController.text,
         imagemProduto: null,
         idMarca: marca.idMarca);
+    produto.addCategoria(categoria);
     await widget.controller.insertEntity(produto);
 
     String? imagemProduto;

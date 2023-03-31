@@ -9,6 +9,7 @@ import 'package:sqflite/sqflite.dart';
 class EntityControllerGeneric {
   DatabaseService service;
   EntityControllerGeneric({required this.service});
+
   Future insertEntity(Entity entity, [Database? database]) async {
     Database db;
     if (database == null) {
@@ -152,6 +153,46 @@ class EntityControllerGeneric {
     return result;
   }
 
+  Future _getForeignValues(List<Entity> entities) async {
+    for (var entity in entities) {
+      if (entity is IForeignKey) {
+        var values = await _getForeignValue(entity as IForeignKey);
+        (entity as IForeignKey).insertForeignValues(values);
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> _getForeignValue(IForeignKey entity) async {
+    Map<String, dynamic> values = {};
+    for (var key in (entity).getForeignKeys()) {
+      var value = await getEntity(key.tableEntity);
+      if (value != null) {
+        values[value.tableName] = value;
+      }
+    }
+    return values;
+  }
+
+  Future _getRelationshipValues(List<Entity> entities) async {
+    for (var entity in entities) {
+      if (entity is IRelationshipMultiple) {
+        var map = await _getRelationshipValue(entity as IRelationshipMultiple);
+        (entity as IRelationshipMultiple).addRelationshipValues(map);
+      }
+    }
+  }
+
+  Future<Map<String, List<Entity>>> _getRelationshipValue(
+      IRelationshipMultiple entity) async {
+    Map<String, List<Entity>> map = {};
+    var conditions = entity.relationshipSearchCondition();
+    for (var table in conditions.keys) {
+      var values = await getEntitiesWhere(table, conditions[table]!);
+      map[table.tableName] = values;
+    }
+    return map;
+  }
+
   Future<List<Entity>> getEntitiesWhere(
       Entity entity, Map<String, String> whereArgs) async {
     Database db = await service.database;
@@ -162,6 +203,9 @@ class EntityControllerGeneric {
     );
     var entities = maps.map((e) => entity.fromMap(e)).toList();
 
+    await _getForeignValues(entities);
+    await _getRelationshipValues(entities);
+/*
     for (var entity in entities) {
       if (entity is IForeignKey) {
         Map<String, dynamic> values = {};
@@ -184,7 +228,7 @@ class EntityControllerGeneric {
           (entity as IRelationshipMultiple).addRelationshipValues(map);
         }
       }
-    }
+    }*/
     return entities;
   }
 
@@ -192,7 +236,10 @@ class EntityControllerGeneric {
     Database db = await service.database;
     List<Map<String, dynamic>> maps = await db.query(entity.tableName);
     var entities = maps.map((e) => entity.fromMap(e)).toList();
+    _getForeignValues(entities);
+    _getRelationshipValues(entities);
 
+/*
     for (var entity in entities) {
       if (entity is IForeignKey) {
         Map<String, dynamic> values = {};
@@ -206,10 +253,10 @@ class EntityControllerGeneric {
         (entity as IForeignKey).insertForeignValues(values);
       }
     }
-
+*/
     return entities;
   }
-
+/*
   Future<Map<String, dynamic>> _getForeignValues(Entity entity) async {
     Map<String, dynamic> values = {};
     for (var key in (entity as IForeignKey).getForeignKeys()) {
@@ -229,7 +276,7 @@ class EntityControllerGeneric {
       }
     }
     return values;
-  }
+  }*/
 
   String _generateWhere(Map<String, String> args) {
     String where = '';
@@ -253,26 +300,6 @@ class EntityControllerGeneric {
       whereArgs.add(val);
     }
 
-    return whereArgs;
-  }
-
-  String _recoverWhere(Entity entity) {
-    String where = '';
-    for (var ent in entity.getPrimaryKeys().keys) {
-      if (where.isNotEmpty) {
-        where = '$where, $ent = ?';
-      } else {
-        where = '$ent = ?';
-      }
-    }
-    return where;
-  }
-
-  List<String> _recoverWhereArgs(Entity entity) {
-    List<String> whereArgs = [];
-    for (var whr in entity.getPrimaryKeys().values) {
-      whereArgs.add(whr);
-    }
     return whereArgs;
   }
 }

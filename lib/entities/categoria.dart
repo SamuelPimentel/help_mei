@@ -54,12 +54,12 @@ class Categoria extends Entity implements IRequestNewPrimaryKey {
   Categoria({
     required this.idCategoria,
     required this.nomeCategoria,
-    required this.imageName,
+    this.imageName,
   }) : super(tableName: CategoriaTable.tableName);
 
   Categoria.noPrimaryKey({
     required String nomeCategoria,
-    required String imageName,
+    String? imageName,
   }) : this(
           idCategoria: nextPrimaryKey(),
           nomeCategoria: nomeCategoria,

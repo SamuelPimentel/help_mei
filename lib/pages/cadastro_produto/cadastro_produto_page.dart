@@ -7,7 +7,6 @@ import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
 import 'package:help_mei/helpers/constantes.dart';
 import 'package:help_mei/main.dart';
-import 'package:help_mei/pages/cadastro_conta/widgets/dropdown_cadastro.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/autocomplete_produto.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/dropdown_cadastro.dart';
 import 'package:help_mei/pages/cadastro_produto/widgets/textfield_cadastro_produto.dart';
@@ -33,7 +32,7 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
 
   final TextEditingController _descricaoController = TextEditingController();
 
-  final TextEditingController _categoriaController = TextEditingController();
+  final globalScaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
   List<Categoria> categorias = [];
 
@@ -55,93 +54,106 @@ class _CadastroProdutoPageState extends State<CadastroProdutoPage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Cadastro de Produto'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: SingleChildScrollView(
-          child: Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(70),
-                  splashColor: Theme.of(context).colorScheme.secondary,
-                  onTap: () async {
-                    if (!Platform.isLinux) {
-                      var status = await Permission.photos.status;
-                      if (status.isDenied) {
-                        print('não pode acessar');
-                      }
-                    }
-                    FilePickerResult? result =
-                        await FilePicker.platform.pickFiles(
-                      type: FileType.image,
-                    );
-                    if (result != null) {
-                      File image = File(result.files.single.path!);
-                      setState(() {
-                        imageFile = image;
-                      });
-                    }
-                  },
-                  child: Container(
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: Colors.white38,
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: imageFile == null
-                            ? const AssetImage('assets/images/waiting.png')
-                                as ImageProvider
-                            : FileImage(imageFile!),
-                      ),
-                    ),
-                  ),
-                ),
-                textfieldCadastroProduto(
-                    context, 'Nome do produto', _nomeController),
-                textfieldCadastroProduto(
-                    context, 'Descrição do produto', _descricaoController),
-                autoCompleteProduto(
-                  _marcaController,
-                  widget.marcas.map((marca) {
-                    return marca.nomeMarca;
-                  }).toList(),
-                  'Marca do produto:',
-                ),
-                dropDownCadastroPage(
-                  items: categorias.map<DropdownMenuItem<String>>((e) {
-                    return DropdownMenuItem<String>(
-                      value: e.nomeCategoria,
-                      child: Text(e.nomeCategoria),
-                    );
-                  }).toList(),
-                  value: categoriaValue,
-                  onChanged: (value) {
-                    setState(() {
-                      categoriaValue = value!;
-                    });
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                    onPressed: () {
-                      _concluirCadastro(context);
-                    },
-                    child: Text('Cadastrar'))
-              ],
-            ),
+  void inkWellOnTap() async {
+    if (!Platform.isLinux) {
+      var status = await Permission.photos.status;
+      if (status.isDenied) {
+        const snackBar = SnackBar(
+          content: Text('"Não foi possível acessar as imagens'),
+        );
+        globalScaffoldKey.currentState!.showSnackBar(snackBar);
+        return;
+      }
+    }
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+    if (result != null) {
+      File image = File(result.files.single.path!);
+      setState(() {
+        imageFile = image;
+      });
+    }
+  }
+
+  Widget inkWellImage(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(70),
+      splashColor: Theme.of(context).colorScheme.secondary,
+      onTap: inkWellOnTap,
+      child: Container(
+        width: 150,
+        height: 150,
+        decoration: BoxDecoration(
+          color: Colors.white38,
+          shape: BoxShape.circle,
+          image: DecorationImage(
+            image: imageFile == null
+                ? const AssetImage('assets/images/waiting.png') as ImageProvider
+                : FileImage(imageFile!),
           ),
         ),
       ),
+    );
+  }
+
+  Widget bodyWidget(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: SingleChildScrollView(
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              inkWellImage(context),
+              textfieldCadastroProduto(
+                  context, 'Nome do produto', _nomeController),
+              textfieldCadastroProduto(
+                  context, 'Descrição do produto', _descricaoController),
+              autoCompleteProduto(
+                _marcaController,
+                widget.marcas.map((marca) {
+                  return marca.nomeMarca;
+                }).toList(),
+                'Marca do produto:',
+              ),
+              dropDownCadastroPage(
+                items: categorias.map<DropdownMenuItem<String>>((e) {
+                  return DropdownMenuItem<String>(
+                    value: e.nomeCategoria,
+                    child: Text(e.nomeCategoria),
+                  );
+                }).toList(),
+                value: categoriaValue,
+                onChanged: (value) {
+                  setState(() {
+                    categoriaValue = value!;
+                  });
+                },
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    _concluirCadastro(context);
+                  },
+                  child: const Text('Cadastrar'))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: globalScaffoldKey,
+      appBar: AppBar(
+        title: const Text('Cadastro de Produto'),
+      ),
+      body: bodyWidget(context),
     );
   }
 

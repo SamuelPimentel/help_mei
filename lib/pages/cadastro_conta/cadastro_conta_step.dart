@@ -206,7 +206,7 @@ class _CadastroContaStepState extends State<CadastroContaStep> {
         DateFormat('dd-MM-yyyy').parse(_dateEditingController.text);
     Conta conta = Conta.noPrimaryKey(
         idTipoConta: tipoContaSelecionada.idTipoConta,
-        idProduto: null,
+        idProduto: 0,
         descricaoConta: '',
         valorConta: valor,
         totalParcelas: qtdeParcelas,

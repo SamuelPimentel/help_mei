@@ -120,9 +120,8 @@ class TipoConta extends Entity implements IRequestNewPrimaryKey {
           iconTipoConta: map[TipoContaTable.columnIconTipoConta] == null
               ? null
               : Icon(
-                  IconData(
-                    map[TipoContaTable.columnIconTipoConta],
-                  ),
+                  IconData(map[TipoContaTable.columnIconTipoConta],
+                      fontFamily: 'MaterialIcons'),
                 ),
         );
   TipoConta.empty() : this(idTipoConta: 0, nomeTipoConta: '');

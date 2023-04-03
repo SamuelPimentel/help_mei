@@ -29,78 +29,9 @@ class CreateTablesCurrent {
   }
 
   void initializaTipoConta(Batch batch) {
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (1, "Conta de Luz");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (2, "Conta de Água");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (3, "Conta de Gás");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (4, "Conta de Telefone");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (5, "Conta de Celular");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (6, "Conta de Internet");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (7, "Conta de TV por assinatura");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (8, "Mercado");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (9, "Atacado");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (10, "Matéria prima");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (11, "Mercadoria");
-    ''');
-    batch.execute('''
-    INSERT INTO ${TipoContaTable.tableName}
-      (${TipoContaTable.columnIdTipoConta}, ${TipoContaTable.columnNomeTipoConta})
-    VALUES
-      (12, "Cartão de crédito");
-    ''');
+    for (var v in TipoContaTable.initialValues) {
+      batch.execute(v);
+    }
   }
 
   void createTableContasMesItensV1(Batch batch) {

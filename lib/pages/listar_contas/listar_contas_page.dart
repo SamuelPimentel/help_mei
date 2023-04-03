@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
 import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
+import 'package:help_mei/main.dart';
 import 'package:help_mei/pages/modal_conta/conta_simples_modal.dart';
-import 'package:path/path.dart';
+import 'package:intl/intl.dart';
 
 class ListarContasPage extends StatefulWidget {
   const ListarContasPage(
@@ -33,6 +34,9 @@ class _ListarContasPageState extends State<ListarContasPage> {
     var items = await widget.controller.getEntities(Conta.empty());
     int ano = DateTime.now().year;
     var res = items.where((element) {
+      if (!(element as Conta).ativaConta) {
+        return false;
+      }
       if ((element as Conta).dataPagamento == null) {
         if (element.dataVencimento.year == ano &&
             element.dataVencimento.month == widget.month) {
@@ -121,23 +125,117 @@ class _ListarContasPageState extends State<ListarContasPage> {
   Widget contaCard(BuildContext context, Conta conta) {
     return Card(
       elevation: 5,
-      child: Row(
-        children: [
-          Icon(
-            conta.tipoConta!.iconTipoConta!.icon,
-            size: 50,
-          ),
-          const VerticalDivider(),
-          Column(
-            children: [
-              Text(
-                'R\$ ${conta.valorConta}',
-                style: Theme.of(context).textTheme.headlineLarge,
-              )
-            ],
-          )
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Icon(
+              conta.tipoConta!.iconTipoConta!.icon,
+              size: 50,
+            ),
+            const VerticalDivider(),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'R\$ ${conta.valorConta}',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  )
+                ],
+              ),
+            ),
+            const VerticalDivider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text('Pagamento:'),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(DateFormat('dd-MM-yyyy').format(conta.dataPagamento!))
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text('Tipo:'),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(conta.tipoConta!.nomeTipoConta)
+                  ],
+                )
+              ],
+            ),
+            const VerticalDivider(),
+            InkWell(
+              splashColor: Theme.of(context).colorScheme.secondary,
+              onTap: () {
+                onTapCard(conta);
+              },
+              child: const SizedBox(
+                height: 50,
+                child: Icon(
+                  Icons.delete,
+                  size: 30,
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
+  }
+
+  void onTapCard(Conta conta) {
+    var context = navigatorKey.currentState!.context;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Não'),
+            ),
+            TextButton(
+                onPressed: () {
+                  onTapExcluiDespesa(conta);
+                },
+                child: const Text('Sim'))
+          ],
+          content: const Text('Deseja excluir a despesa?'),
+        );
+      },
+    );
+  }
+
+  void onTapExcluiDespesa(Conta conta) async {
+    var context = navigatorKey.currentState!.context;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Dialog(
+          child: SizedBox(
+            width: 50,
+            height: 100,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        );
+      },
+    );
+    conta.ativaConta = false;
+    await widget.controller.updateEntity(conta);
+    if (context.mounted) {
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      setState(() {
+        getFuture();
+      });
+    }
   }
 }

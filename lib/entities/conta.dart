@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:help_mei/entities/conta_parcelada.dart';
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
 import 'package:help_mei/entities/fornecedor.dart';
@@ -15,6 +16,7 @@ class ContaTable {
   static const idFornecedorName = 'id_fornecedor';
   static const columnIdTipoConta = 'id_tipo_conta';
   static const columnIdProduto = 'id_produto';
+  static const columnIdContaParcelada = 'id_conta_parcelada';
   static const columnDescricaoConta = 'descricao_conta';
   static const columnValorConta = 'valor_conta';
   static const columnTotalParcelas = 'total_parcelas';
@@ -43,6 +45,7 @@ class ContaTable {
       $columnIdConta ${SqliteTipos.integer} ${SqlitePropriedades.primaryKey},
       $columnIdTipoConta ${SqliteTipos.integer},
       $columnIdProduto ${SqliteTipos.integer},
+      $columnIdContaParcelada ${SqliteTipos.integer},
       $columnDescricaoConta TEXT,
       $columnValorConta REAL,
       $columnTotalParcelas INTEGER,
@@ -52,6 +55,7 @@ class ContaTable {
       $columnAtivaConta INTEGER,
       FOREIGN KEY ($columnIdTipoConta) REFERENCES ${TipoContaTable.tableName} (${TipoContaTable.columnIdTipoConta}),
       FOREIGN KEY ($columnIdProduto) REFERENCES ${ProdutoTable.tableName} (${ProdutoTable.columnIdProduto})
+      FOREIGN KEY ($columnIdContaParcelada) REFERENCES ${ContaParceladaTable.tableName} (${ContaParceladaTable.columnIdContaParcelada})
     );''';
   ContaTable._();
 }
@@ -60,6 +64,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   int idConta;
   int idTipoConta;
   int? idProduto;
+  int? idContaParcelada;
   String? descricaoConta;
   double valorConta;
   int totalParcelas;
@@ -67,6 +72,15 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   bool quitadaConta;
   bool ativaConta;
   DateTime? dataPagamento;
+
+  ContaParcelada? _contaParcelada;
+  ContaParcelada? get contaParcelada => _contaParcelada;
+  set contaParcelada(ContaParcelada? value) {
+    _contaParcelada = value;
+    if (value != null) {
+      idContaParcelada = value.idContaParcelada;
+    }
+  }
 
   Fornecedor? _fornecedor;
   Fornecedor? get fornecedor => _fornecedor;
@@ -99,6 +113,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     required this.idConta,
     required this.idTipoConta,
     this.idProduto,
+    this.idContaParcelada,
     required this.descricaoConta,
     required this.valorConta,
     required this.totalParcelas,
@@ -111,6 +126,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   Conta.noPrimaryKey({
     required int idTipoConta,
     int? idProduto,
+    int? idContaParcelada,
     required descricaoConta,
     required valorConta,
     required totalParcelas,
@@ -119,22 +135,25 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     required quitadaConta,
     required ativaConta,
   }) : this(
-            idConta: nextPrimaryKey(),
-            idTipoConta: idTipoConta,
-            idProduto: idProduto,
-            descricaoConta: descricaoConta,
-            valorConta: valorConta,
-            totalParcelas: totalParcelas,
-            dataVencimento: dataVencimento,
-            quitadaConta: quitadaConta,
-            ativaConta: ativaConta,
-            dataPagamento: dataPagamento);
+          idConta: nextPrimaryKey(),
+          idTipoConta: idTipoConta,
+          idProduto: idProduto,
+          descricaoConta: descricaoConta,
+          valorConta: valorConta,
+          totalParcelas: totalParcelas,
+          dataVencimento: dataVencimento,
+          quitadaConta: quitadaConta,
+          ativaConta: ativaConta,
+          dataPagamento: dataPagamento,
+          idContaParcelada: idContaParcelada,
+        );
 
   Conta.fromMap(Map map)
       : this(
           idConta: map[ContaTable.columnIdConta],
           idTipoConta: map[ContaTable.columnIdTipoConta],
           idProduto: map[ContaTable.columnIdProduto],
+          idContaParcelada: map[ContaTable.columnIdContaParcelada],
           descricaoConta: map[ContaTable.columnDescricaoConta],
           valorConta: map[ContaTable.columnValorConta],
           totalParcelas: map[ContaTable.columnTotalParcelas],
@@ -216,6 +235,17 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
       );
     }
 
+    if (idContaParcelada != null) {
+      foreignKeys.add(
+        ForeignKey(
+          tableEntity: ContaParcelada.empty(),
+          keys: {
+            ContaParceladaTable.columnIdContaParcelada: idContaParcelada,
+          },
+        ),
+      );
+    }
+
     return foreignKeys;
   }
 
@@ -223,6 +253,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
   void insertForeignValues(Map<String, dynamic> values) {
     tipoConta = values[TipoContaTable.tableName];
     produto = values[ProdutoTable.tableName];
+    contaParcelada = values[ContaParceladaTable.tableName];
   }
 
   @override

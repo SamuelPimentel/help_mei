@@ -83,7 +83,7 @@ class Categoria extends Entity implements IRequestNewPrimaryKey {
           idCategoria: map[CategoriaTable.columnIdCategoria],
           nomeCategoria: map[CategoriaTable.columnNomeCategoria],
           imageName: map[CategoriaTable.columnImageName],
-          colorCategoria: map[CategoriaTable.colmunColorCategoria],
+          colorCategoria: Color(map[CategoriaTable.colmunColorCategoria]),
           isActive: map[CategoriaTable.columnActive] == 1 ? true : false,
         );
 

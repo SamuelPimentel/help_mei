@@ -91,6 +91,12 @@ class TipoContaTable {
     VALUES
     (12, "Cartão de crédito", ${Icons.credit_card.codePoint});
     ''',
+    '''
+    INSERT INTO $tableName
+      ($columnIdTipoConta, $columnNomeTipoConta, $columnIconTipoConta) 
+    VALUES
+    (13, "Parcela", ${Icons.real_estate_agent.codePoint});
+    ''',
   ];
   TipoContaTable._();
 }

@@ -201,6 +201,7 @@ class Conta extends Entity implements IForeignKey, IRequestNewPrimaryKey {
     return {
       ContaTable.columnIdConta: idConta,
       ContaTable.columnIdProduto: idProduto,
+      ContaTable.columnIdContaParcelada: idContaParcelada,
       ContaTable.columnDescricaoConta: descricaoConta,
       ContaTable.columnIdTipoConta: idTipoConta,
       ContaTable.columnValorConta: valorConta,

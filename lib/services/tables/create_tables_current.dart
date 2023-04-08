@@ -2,6 +2,7 @@ import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/conta_parcelada.dart';
 import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
+import 'package:help_mei/entities/tipo_movimentacao.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../../entities/conta.dart';
@@ -60,12 +61,7 @@ class CreateTablesCurrent {
   }
 
   void createTableTipoMovimentacaoV1(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS tipo_movimentacao;');
-    batch.execute('''
-      CREATE TABLE tipo_movimentacao (
-        id_tipo_movimentacao INTEGER PRIMARY KEY,
-        nome_tipo_movimentacao TEXT UNIQUE NOT NULL
-      );''');
+    batch.execute(TipoMovimentacaoTable.createString);
   }
 
   void createTableEntradaSaidaV1(Batch batch) {
@@ -165,9 +161,8 @@ class CreateTablesCurrent {
   }
 
   void inicializaTipoMovimentacaoV1(Batch batch) {
-    batch.execute(
-        'INSERT INTO tipo_movimentacao (id_tipo_movimentacao, nome_tipo_movimentacao) VALUES(1, "compra");');
-    batch.execute(
-        'INSERT INTO tipo_movimentacao (id_tipo_movimentacao, nome_tipo_movimentacao) VALUES (2, "venda");');
+    for (var value in TipoMovimentacaoTable.initialValues) {
+      batch.execute(value);
+    }
   }
 }

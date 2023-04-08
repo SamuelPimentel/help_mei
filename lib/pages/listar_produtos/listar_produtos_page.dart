@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
+import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/entities/saldos.dart';
 import 'package:help_mei/helpers/constantes.dart';
 import 'package:help_mei/pages/cadastro_produto/cadastro_produto_page.dart';
-import 'package:help_mei/pages/listar_produtos/widgets/produto_card.dart';
+import 'package:help_mei/widgets/produto_card.dart';
+
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -75,7 +78,26 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
       padding: const EdgeInsets.all(10),
       itemCount: snapshot.data['produtos'].length,
       itemBuilder: (context, index) {
-        return produtoCard(context, snapshot.data['produtos'][index]);
+        return ProdutoCard(
+          controller: widget.controller,
+          produto: snapshot.data['produtos'][index],
+          categorias: snapshot.data['categorias'].where((element) {
+            for (var cat in snapshot.data['produtos'][index].categorias) {
+              if (cat.idCategoria == element.idCategoria) return true;
+            }
+            return false;
+          }).toList(),
+          saldo: snapshot.data['saldos']
+              .where((element) =>
+                  element.idProduto ==
+                  snapshot.data['produtos'][index].idProduto)
+              .first,
+          refresh: () {
+            setState(() {
+              getFuture();
+            });
+          },
+        );
       },
     );
   }
@@ -83,6 +105,17 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
   Future<Map> getFuture() async {
     var itens = await widget.controller.getEntities(Produto.empty());
     List<Produto> produtos = [];
+    var cats = await widget.controller.getEntities(Categoria.empty());
+    List<Categoria> categorias = [];
+    for (var cat in cats) {
+      categorias.add(cat as Categoria);
+    }
+
+    var sa = await widget.controller.getEntities(Saldos.empty());
+    List<Saldos> saldos = [];
+    for (var s in sa) {
+      saldos.add(s as Saldos);
+    }
 
     Directory documentDirectory = await getApplicationDocumentsDirectory();
 
@@ -103,6 +136,10 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
       }
     }
 
-    return {'produtos': produtos};
+    return {
+      'produtos': produtos,
+      'categorias': categorias,
+      'saldos': saldos,
+    };
   }
 }

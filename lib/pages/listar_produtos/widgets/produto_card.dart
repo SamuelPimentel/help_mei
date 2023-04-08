@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/produto.dart';
 
-Widget produtoCard(BuildContext context, Produto produto) {
+Widget produtoCard(
+    BuildContext context, Produto produto, List<Categoria> categorias) {
   return Card(
     elevation: 5,
     child: Row(
       children: [
-        SizedBox(
-          width: 10,
-        ),
+        const SizedBox(width: 10),
         Flexible(
           flex: 1,
           child: Container(
@@ -25,9 +25,7 @@ Widget produtoCard(BuildContext context, Produto produto) {
             ),
           ),
         ),
-        SizedBox(
-          width: 10,
-        ),
+        const SizedBox(width: 10),
         Flexible(
           flex: 5,
           child: Column(

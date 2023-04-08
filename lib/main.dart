@@ -5,10 +5,6 @@ import 'package:help_mei/controller/entity_controller_generic.dart';
 import 'package:help_mei/entities/marca.dart';
 import 'package:help_mei/entities/produto.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
-import 'package:help_mei/pages/cadastro_conta/cadastro_conta_page.dart';
-import 'package:help_mei/pages/cadastro_produto/cadastro_produto_page.dart';
-import 'package:help_mei/pages/home_page.dart';
-import 'package:help_mei/pages/listar_contas/listar_contas_page.dart';
 import 'package:help_mei/pages/listar_produtos/listar_produtos_page.dart';
 import 'package:help_mei/services/sqlite_service_on_disk.dart';
 import 'package:sqflite/sqflite.dart';
@@ -44,8 +40,9 @@ void main() async {
 
   runApp(MaterialApp(
     navigatorKey: navigatorKey,
-    home: ListarContasPage(
-      month: DateTime.now().month,
+    home: ListarProdutosPage(
+      produtos: produtos,
+      marcas: marcas,
       controller: controller,
     ),
     theme: buildTheme(),

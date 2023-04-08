@@ -2,6 +2,7 @@ import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/conta_parcelada.dart';
 import 'package:help_mei/entities/entrada_saida.dart';
 import 'package:help_mei/entities/produto_categoria.dart';
+import 'package:help_mei/entities/saldos.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/entities/tipo_movimentacao.dart';
 import 'package:sqflite/sqflite.dart';
@@ -70,15 +71,7 @@ class CreateTablesCurrent {
   }
 
   void createTableSaldosV1(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS saldos;');
-    batch.execute('''
-      CREATE TABLE saldos (
-        id_produto INTEGER PRIMARY KEY,
-        quantidade_saldos INTEGER,
-        custo_unitario_saldos REAL,
-        total_saldos REAL,
-        FOREIGN KEY (id_produto) REFERENCES produto (id_produto)
-      );''');
+    batch.execute(SaldosTable.createString);
   }
 
   void createTableHistoricoSaldoV1(Batch batch) {
@@ -112,40 +105,10 @@ class CreateTablesCurrent {
       );''');
   }
 
-  void createTriggerInicializaSaldoV1(Batch batch) {
-    batch.execute('DROP TRIGGER IF EXISTS inicializa_saldo;');
-    batch.execute('''
-      CREATE TRIGGER inicializa_saldo AFTER INSERT ON produto
-      BEGIN 
-        INSERT INTO saldos (id_produto, quantidade_saldos, custo_unitario_saldos, total_saldos)
-        VALUES (NEW.id_produto, 0, 0, 0);
-      END;
-      ''');
-  }
-
-  void createTriggerAtualizaSaldoCompraV1(Batch batch) {
-    batch.execute('DROP TRIGGER IF EXISTS atualiza_saldo_compra;');
-    batch.execute('''
-      CREATE TRIGGER atualiza_saldo_compra AFTER INSERT ON entrada_saida
-        WHEN NEW.id_tipo_movimentacao = 1
-      BEGIN 
-        UPDATE saldos SET quantidade_saldos = (saldos.quantidade_saldos + NEW.quantidade_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
-        UPDATE saldos SET total_saldos = (saldos.total_saldos + NEW.total_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
-        UPDATE saldos SET custo_unitario_saldos = (saldos.total_saldos/saldos.quantidade_saldos) WHERE saldos.id_produto = NEW.id_produto;
-      END;
-      ''');
-  }
-
-  void createTriggerAtualizaSaldoVendaV1(Batch batch) {
-    batch.execute('DROP TRIGGER IF EXISTS atualiza_saldo_venda;');
-    batch.execute('''
-      CREATE TRIGGER atualiza_saldo_venda AFTER INSERT ON entrada_saida
-        WHEN NEW.id_tipo_movimentacao = 2
-      BEGIN 
-        UPDATE saldos SET quantidade_saldos = (saldos.quantidade_saldos - NEW.quantidade_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
-        UPDATE saldos SET total_saldos = (saldos.total_saldos - NEW.total_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
-      END;
-      ''');
+  void createTriggersSaldos(Batch batch) {
+    for (var value in SaldosTable.createTriggers) {
+      batch.execute(value);
+    }
   }
 
   void inicializaTipoMovimentacaoV1(Batch batch) {

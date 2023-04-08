@@ -14,9 +14,7 @@ class OnCreateCurrent implements IOnCreate {
     tables.createTableSaldosV1(batch);
     //tables.createTableHistoricoSaldoV1(batch);
     tables.createTableTotais(batch);
-    tables.createTriggerInicializaSaldoV1(batch);
-    tables.createTriggerAtualizaSaldoCompraV1(batch);
-    tables.createTriggerAtualizaSaldoVendaV1(batch);
+    tables.createTriggersSaldos(batch);
     tables.inicializaTipoMovimentacaoV1(batch);
     tables.createTableTipoConta(batch);
     tables.initializaTipoConta(batch);

@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "nome": "Alimentos básicos"
+    },
+    {
+        "id": 2,
+        "nome": "Bebidas"
+    },
+    {
+        "id": 3,
+        "nome": "limpeza"
+    },
+    {
+        "id": 4,
+        "nome": "Leites e iogurtes"
+    },
+    {
+        "id": 5,
+        "nome": "Biscoitos e salgadinhos"
+    },
+    {
+        "id": 6,
+        "nome": "Doces e sobremesas"
+    },
+    {
+        "id": 7,
+        "nome": "Frios e latícinios"
+    },
+    {
+        "id": 8,
+        "nome": "Molhos, condimentos e conservas"
+    },
+    {
+        "id": 9,
+        "nome": "Higiene e cuidados pessoais"
+    },
+    {
+        "id": 10,
+        "nome": "Padaria e matinais"
+    },
+    {
+        "id": 11,
+        "nome": "Carnes, aves e peixes"
+    },
+    {
+        "id": 12,
+        "nome": "Legumes e vegetais"
+    },
+    {
+        "id": 13,
+        "nome": "Utensílios para o lar"
+    },
+    {
+        "id": 14,
+        "nome": "Bebidas alcoólicas"
+    },
+    {
+        "id": 15,
+        "nome": "Bebidas alcoólicas"
+    }
+]

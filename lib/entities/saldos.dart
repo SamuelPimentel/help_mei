@@ -1,6 +1,10 @@
-import 'package:help_mei/entities/entity.dart';
+import 'dart:math';
 
-class Saldos extends Entity {
+import 'package:help_mei/entities/entity.dart';
+import 'package:help_mei/entities/interfaces/irequest_new_primary_key.dart';
+import 'package:help_mei/helpers/constantes.dart';
+
+class Saldos extends Entity implements IRequestNewPrimaryKey {
   int idProduto;
   int quantidadeSaldos;
   double custoUnitarioSaldos;
@@ -33,6 +37,12 @@ class Saldos extends Entity {
   @override
   void setPrimaryKeys(Map<String, dynamic> keys) {
     idProduto = keys['id_produto'];
+  }
+
+  @override
+  void requestNewPrimaryKeys() {
+    var rnd = Random();
+    idProduto = rnd.nextInt(maxInt32);
   }
 
   @override

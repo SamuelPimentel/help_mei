@@ -3,6 +3,7 @@ import 'package:help_mei/entities/conta_parcelada.dart';
 import 'package:help_mei/entities/entrada_saida.dart';
 import 'package:help_mei/entities/forma_pagamento.dart';
 import 'package:help_mei/entities/produto_categoria.dart';
+import 'package:help_mei/entities/produto_venda.dart';
 import 'package:help_mei/entities/saldos.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/entities/tipo_movimentacao.dart';
@@ -16,6 +17,10 @@ import '../../../entities/marca.dart';
 import '../../../entities/produto.dart';
 
 class CreateTablesCurrent {
+  void createTableProdutoVenda(Batch batch) {
+    batch.execute(ProdutoVendaTable.createString);
+  }
+
   void createTableVenda(Batch batch) {
     batch.execute(VendaTable.createString);
   }

@@ -1,6 +1,9 @@
 import 'package:help_mei/entities/entity.dart';
 import 'package:help_mei/entities/foreign_key.dart';
 import 'package:help_mei/entities/forma_pagamento.dart';
+import 'package:help_mei/entities/interfaces/irelationship_multiple.dart';
+import 'package:help_mei/entities/produto.dart';
+import 'package:help_mei/entities/produto_venda.dart';
 import 'package:help_mei/helpers/constantes.dart';
 import 'package:help_mei/helpers/helper.dart';
 
@@ -26,7 +29,7 @@ class VendaTable {
   ''';
 }
 
-class Venda extends Entity implements IForeignKey {
+class Venda extends Entity implements IForeignKey, IRelationshipMultiple {
   int id;
   double total;
   int quantidadeProdutos;
@@ -42,6 +45,8 @@ class Venda extends Entity implements IForeignKey {
       idFormaPagamento = value.id;
     }
   }
+
+  List<ProdutoVenda> produtos = [];
 
   Venda({
     required this.id,
@@ -83,6 +88,37 @@ class Venda extends Entity implements IForeignKey {
           quantidadeProdutos: 0,
           total: 0,
         );
+
+  void addProduto(Produto produto, int quantidade, double preco) {
+    ProdutoVenda venda;
+    var res =
+        produtos.where((element) => element.idProduto == produto.idProduto);
+    if (res.isEmpty) {
+      venda = ProdutoVenda.noPrimaryKey(
+        idVenda: id,
+        produto: produto,
+        precoProduto: preco,
+        quantidadeProduto: quantidade,
+      );
+    } else {
+      venda = res.first;
+      venda.quantidadeProduto = quantidade;
+      venda.precoProduto = preco;
+    }
+    produtos.add(venda);
+  }
+
+  void addProdutoVenda(ProdutoVenda produtoVenda) {
+    produtos.add(produtoVenda);
+  }
+
+  void removeProduto(Produto produto) {
+    var res =
+        produtos.where((element) => element.idProduto == produto.idProduto);
+    if (res.isNotEmpty) {
+      produtos.remove(res.first);
+    }
+  }
 
   @override
   Entity fromMap(Map map) {
@@ -152,5 +188,28 @@ class Venda extends Entity implements IForeignKey {
         dataVenda.hashCode +
         idFormaPagamento.hashCode +
         total.hashCode;
+  }
+
+  @override
+  void addRelationshipValues(Map<String, List<Entity>> values) {
+    for (var val in values[ProdutoVendaTable.tableName]!) {
+      addProdutoVenda(val as ProdutoVenda);
+    }
+  }
+
+  @override
+  Map<String, List<Entity>> insertValues() {
+    return {ProdutoVendaTable.tableName: produtos};
+  }
+
+  @override
+  Map<Entity, Map<String, String>> relationshipSearchCondition() {
+    Map<Entity, Map<String, String>> map = {};
+
+    map[ProdutoVenda.empty()] = {
+      ProdutoVendaTable.columnIdVenda: id.toString()
+    };
+
+    return map;
   }
 }

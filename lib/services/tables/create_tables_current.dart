@@ -6,6 +6,7 @@ import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/entities/saldos.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/entities/tipo_movimentacao.dart';
+import 'package:help_mei/entities/venda.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../../entities/conta.dart';
@@ -15,6 +16,10 @@ import '../../../entities/marca.dart';
 import '../../../entities/produto.dart';
 
 class CreateTablesCurrent {
+  void createTableVenda(Batch batch) {
+    batch.execute(VendaTable.createString);
+  }
+
   void createTableFormaPagamento(Batch batch) {
     batch.execute(FormaPagamentoTable.createString);
   }

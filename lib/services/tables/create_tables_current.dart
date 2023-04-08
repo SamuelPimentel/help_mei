@@ -1,6 +1,7 @@
 import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/conta_parcelada.dart';
 import 'package:help_mei/entities/entrada_saida.dart';
+import 'package:help_mei/entities/forma_pagamento.dart';
 import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/entities/saldos.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
@@ -14,6 +15,16 @@ import '../../../entities/marca.dart';
 import '../../../entities/produto.dart';
 
 class CreateTablesCurrent {
+  void createTableFormaPagamento(Batch batch) {
+    batch.execute(FormaPagamentoTable.createString);
+  }
+
+  void inicializaTableFormaPagamento(Batch batch) {
+    for (var v in FormaPagamentoTable.initialValues) {
+      batch.execute(v);
+    }
+  }
+
   void createTableContaParcelada(Batch batch) {
     batch.execute(ContaParceladaTable.createStringV1);
   }

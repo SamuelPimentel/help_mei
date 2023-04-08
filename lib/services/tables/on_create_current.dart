@@ -26,6 +26,7 @@ class OnCreateCurrent implements IOnCreate {
     tables.createTableCategoria(batch);
     tables.createTableProdutoCategoria(batch);
     tables.inicializaTableCategoria(batch);
+    tables.createTableContaParcelada(batch);
     await batch.commit();
   }
 }

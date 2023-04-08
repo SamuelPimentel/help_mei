@@ -1,4 +1,5 @@
 import 'package:help_mei/entities/categoria.dart';
+import 'package:help_mei/entities/conta_parcelada.dart';
 import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,6 +11,10 @@ import '../../../entities/marca.dart';
 import '../../../entities/produto.dart';
 
 class CreateTablesCurrent {
+  void createTableContaParcelada(Batch batch) {
+    batch.execute(ContaParceladaTable.createStringV1);
+  }
+
   void inicializaTableCategoria(Batch batch) {
     for (var v in CategoriaTable.initialValues) {
       batch.execute(v);

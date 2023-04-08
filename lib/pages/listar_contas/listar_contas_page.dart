@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:help_mei/controller/entity_controller_generic.dart';
 import 'package:help_mei/entities/conta.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/main.dart';
 import 'package:help_mei/pages/modal_conta/conta_simples_modal.dart';
+import 'package:help_mei/pages/modal_conta_parcelada/conta_parcelada_modal.dart';
 import 'package:intl/intl.dart';
 
 class ListarContasPage extends StatefulWidget {
@@ -37,7 +39,7 @@ class _ListarContasPageState extends State<ListarContasPage> {
       if (!(element as Conta).ativaConta) {
         return false;
       }
-      if ((element as Conta).dataPagamento == null) {
+      if (element.dataPagamento == null) {
         if (element.dataVencimento.year == ano &&
             element.dataVencimento.month == widget.month) {
           return true;
@@ -70,20 +72,45 @@ class _ListarContasPageState extends State<ListarContasPage> {
     });
   }
 
+  void onPressedParcelada(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ContaParceladaModal(
+          controller: widget.controller,
+        );
+      },
+    ).then((value) {
+      setState(() {
+        getFuture();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Despesas do mês ${widget.month}'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          floatingActionButtonOnPressed(context);
-        },
-        child: const Icon(
-          Icons.add,
-          size: 30,
-        ),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_arrow,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.attach_money),
+            label: 'Adicionar Despesa',
+            onTap: () {
+              floatingActionButtonOnPressed(context);
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.credit_card),
+            label: 'Adicionar Despesa Parcelada',
+            onTap: () {
+              onPressedParcelada(context);
+            },
+          )
+        ],
       ),
       body: buildBody(context),
     );
@@ -139,7 +166,7 @@ class _ListarContasPageState extends State<ListarContasPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'R\$ ${conta.valorConta}',
+                    'R\$ ${conta.valorConta.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.headlineLarge,
                   )
                 ],
@@ -155,7 +182,11 @@ class _ListarContasPageState extends State<ListarContasPage> {
                     const SizedBox(
                       width: 5,
                     ),
-                    Text(DateFormat('dd-MM-yyyy').format(conta.dataPagamento!))
+                    if (conta.dataPagamento != null)
+                      Text(
+                          DateFormat('dd-MM-yyyy').format(conta.dataPagamento!))
+                    else
+                      const Text('Não Pago')
                   ],
                 ),
                 Row(
@@ -203,10 +234,11 @@ class _ListarContasPageState extends State<ListarContasPage> {
               child: const Text('Não'),
             ),
             TextButton(
-                onPressed: () {
-                  onTapExcluiDespesa(conta);
-                },
-                child: const Text('Sim'))
+              onPressed: () {
+                onTapExcluiDespesa(conta);
+              },
+              child: const Text('Sim'),
+            )
           ],
           content: const Text('Deseja excluir a despesa?'),
         );

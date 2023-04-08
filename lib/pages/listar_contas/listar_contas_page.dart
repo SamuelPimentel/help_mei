@@ -6,6 +6,7 @@ import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/main.dart';
 import 'package:help_mei/pages/modal_conta/conta_simples_modal.dart';
 import 'package:help_mei/pages/modal_conta_parcelada/conta_parcelada_modal.dart';
+import 'package:help_mei/pages/modal_editar_conta/editar_conta_modal.dart';
 import 'package:intl/intl.dart';
 
 class ListarContasPage extends StatefulWidget {
@@ -87,6 +88,22 @@ class _ListarContasPageState extends State<ListarContasPage> {
     });
   }
 
+  void _onLongPressCard(Conta conta) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return EditarContaModal(
+          conta: conta,
+          controller: widget.controller,
+        );
+      },
+    ).then((value) {
+      setState(() {
+        getFuture();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,69 +169,74 @@ class _ListarContasPageState extends State<ListarContasPage> {
   Widget contaCard(BuildContext context, Conta conta) {
     return Card(
       elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Icon(
-              conta.tipoConta!.iconTipoConta!.icon,
-              size: 50,
-            ),
-            const VerticalDivider(),
-            Expanded(
-              child: Column(
+      child: InkWell(
+        onLongPress: () => _onLongPressCard(conta),
+        splashColor: Theme.of(context).colorScheme.secondary,
+        borderRadius: BorderRadius.circular(5),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Icon(
+                conta.tipoConta!.iconTipoConta!.icon,
+                size: 50,
+              ),
+              const VerticalDivider(),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'R\$ ${conta.valorConta.toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    )
+                  ],
+                ),
+              ),
+              const VerticalDivider(),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'R\$ ${conta.valorConta.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.headlineLarge,
+                  Row(
+                    children: [
+                      const Text('Pagamento:'),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      if (conta.dataPagamento != null)
+                        Text(DateFormat('dd-MM-yyyy')
+                            .format(conta.dataPagamento!))
+                      else
+                        const Text('Não Pago')
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text('Tipo:'),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(conta.tipoConta!.nomeTipoConta)
+                    ],
                   )
                 ],
               ),
-            ),
-            const VerticalDivider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Text('Pagamento:'),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    if (conta.dataPagamento != null)
-                      Text(
-                          DateFormat('dd-MM-yyyy').format(conta.dataPagamento!))
-                    else
-                      const Text('Não Pago')
-                  ],
+              const VerticalDivider(),
+              InkWell(
+                splashColor: Theme.of(context).colorScheme.secondary,
+                onTap: () {
+                  onTapCard(conta);
+                },
+                child: const SizedBox(
+                  height: 50,
+                  child: Icon(
+                    Icons.delete,
+                    size: 30,
+                  ),
                 ),
-                Row(
-                  children: [
-                    const Text('Tipo:'),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(conta.tipoConta!.nomeTipoConta)
-                  ],
-                )
-              ],
-            ),
-            const VerticalDivider(),
-            InkWell(
-              splashColor: Theme.of(context).colorScheme.secondary,
-              onTap: () {
-                onTapCard(conta);
-              },
-              child: const SizedBox(
-                height: 50,
-                child: Icon(
-                  Icons.delete,
-                  size: 30,
-                ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

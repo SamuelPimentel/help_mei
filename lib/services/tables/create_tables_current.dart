@@ -1,5 +1,6 @@
 import 'package:help_mei/entities/categoria.dart';
 import 'package:help_mei/entities/conta_parcelada.dart';
+import 'package:help_mei/entities/entrada_saida.dart';
 import 'package:help_mei/entities/produto_categoria.dart';
 import 'package:help_mei/entities/tipo_conta.dart';
 import 'package:help_mei/entities/tipo_movimentacao.dart';
@@ -65,20 +66,7 @@ class CreateTablesCurrent {
   }
 
   void createTableEntradaSaidaV1(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS entrada_saida;');
-    batch.execute('''
-      CREATE TABLE entrada_saida (
-        id_produto INTEGER,
-        data_id INTEGER,
-        id_entrada_saida INTEGER,
-        data_entrada_saida TEXT NOT NULL,
-        id_movimentacao INTEGER,
-        quantidade_entrada_saida INTEGER,
-        valor_unitario_entrada_saida REAL,
-        total_entrada_saida REAL,
-        FOREIGN KEY (id_produto) REFERENCES produto(id_produto),
-        PRIMARY KEY (id_entrada_saida, data_id, id_produto)
-      );''');
+    batch.execute(EntradaSaidaTable.createString);
   }
 
   void createTableSaldosV1(Batch batch) {
@@ -139,7 +127,7 @@ class CreateTablesCurrent {
     batch.execute('DROP TRIGGER IF EXISTS atualiza_saldo_compra;');
     batch.execute('''
       CREATE TRIGGER atualiza_saldo_compra AFTER INSERT ON entrada_saida
-        WHEN NEW.id_movimentacao = 1
+        WHEN NEW.id_tipo_movimentacao = 1
       BEGIN 
         UPDATE saldos SET quantidade_saldos = (saldos.quantidade_saldos + NEW.quantidade_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
         UPDATE saldos SET total_saldos = (saldos.total_saldos + NEW.total_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
@@ -152,7 +140,7 @@ class CreateTablesCurrent {
     batch.execute('DROP TRIGGER IF EXISTS atualiza_saldo_venda;');
     batch.execute('''
       CREATE TRIGGER atualiza_saldo_venda AFTER INSERT ON entrada_saida
-        WHEN NEW.id_movimentacao = 2
+        WHEN NEW.id_tipo_movimentacao = 2
       BEGIN 
         UPDATE saldos SET quantidade_saldos = (saldos.quantidade_saldos - NEW.quantidade_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
         UPDATE saldos SET total_saldos = (saldos.total_saldos - NEW.total_entrada_saida) WHERE saldos.id_produto = NEW.id_produto;
